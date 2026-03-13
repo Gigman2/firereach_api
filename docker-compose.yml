@@ -1,0 +1,33 @@
+services:
+  api:
+    build: .
+    ports:
+      - "40000:40000"
+    environment:
+      - DATABASE_URL=postgres://firereach:firereach@db:5432/firereach?sslmode=disable
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - ENVIRONMENT=development
+      - PORT=40000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=firereach
+      - POSTGRES_PASSWORD=firereach
+      - POSTGRES_DB=firereach
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U firereach"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
