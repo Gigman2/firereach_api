@@ -18,6 +18,6 @@ WORKDIR /app
 COPY --from=builder /firereach-api .
 COPY migrations/ ./migrations/
 
-EXPOSE 40000
+EXPOSE 8080
 
 CMD ["./firereach-api"]
