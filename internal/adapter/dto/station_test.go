@@ -51,6 +51,16 @@ func TestToStationResponse_ZeroDistanceIsStillSerialized(t *testing.T) {
 	}
 }
 
+func TestToStationResponse_PrimaryPhoneJSONTag(t *testing.T) {
+	blob, err := json.Marshal(dto.ToStationResponse(sampleStation()))
+	if err != nil {
+		t.Fatalf("marshal failed: %v", err)
+	}
+	if !strings.Contains(string(blob), `"primary_phone":"0302666576"`) {
+		t.Errorf("expected primary_phone JSON tag with highest-rate contact, got %s", blob)
+	}
+}
+
 func TestToStationResponse_EmptyPrimaryPhoneWhenNoActiveContacts(t *testing.T) {
 	s := sampleStation()
 	s.Contacts = []domain.StationContact{{Phone: "0302666576", ResponseRate: 1.0, Active: false}}

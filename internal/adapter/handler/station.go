@@ -43,8 +43,16 @@ func (h *StationHandler) ListNearest(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lat parameter"})
 		return
 	}
+	if lat < -90 || lat > 90 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lat parameter"})
+		return
+	}
 	lng, err := strconv.ParseFloat(c.Query("lng"), 64)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lng parameter"})
+		return
+	}
+	if lng < -180 || lng > 180 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lng parameter"})
 		return
 	}
