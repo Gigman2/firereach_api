@@ -34,4 +34,4 @@ tidy:
 	go mod tidy
 
 seed:
-	docker compose exec -T db psql -U firereach -d firereach < seeds/dev_stations.sql
+	docker compose exec -T db psql -v ON_ERROR_STOP=1 -U firereach -d firereach < seeds/dev_stations.sql

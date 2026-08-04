@@ -46,11 +46,18 @@ GNFS_COMMANDS = {
     "central":       ["0332132902", "0299340499"],
     "western":       ["0312193521", "0299346040"],
     "volta":         ["0362026679", "0299346042"],
-    # DISCREPANCY: the official page lists the Northern landline as
-    # 0322022864, but 032 is the Kumasi/Ashanti prefix while Tamale is 037;
-    # an independent aggregator lists 0372022864. Since we cannot verify
-    # which is correct, the undisputed 0299 number is published first and
-    # therefore becomes primary.
+    # DISCREPANCY: this is the ONE region where the list below is
+    # deliberately INVERTED relative to the archived source, so
+    # response_rate no longer encodes pure publication order for these two
+    # numbers. The source page lists 0322022864 first and 0299346046
+    # second. But 032 is the Kumasi/Ashanti prefix while Tamale (the
+    # Northern region seat) is 037, and an independent aggregator lists
+    # 0372022864 instead of 0322022864 — so the source's first-listed
+    # number looks like it may be a misprint. Since we cannot verify which
+    # is correct, we deliberately reorder so the undisputed 0299 number is
+    # listed first here and becomes primary (response_rate 1.0), with the
+    # disputed 032 number second (response_rate 0.5). See the generated
+    # SQL header for the corresponding disclosure.
     "northern":      ["0299346046", "0322022864"],
     "brong ahafo":   ["0352027129", "0299340249"],
     "upper east":    ["0382022277"],
@@ -149,6 +156,13 @@ def main():
     out.write("--   reliability. No GNFS response-rate data is published. The\n")
     out.write("--   field name overstates what these values mean.\n")
     out.write("--\n")
+    out.write("--   EXCEPTION: for Northern-region stations, the order above is\n")
+    out.write("--   deliberately inverted relative to the source page, because the\n")
+    out.write("--   source's first-listed number (0322022864) uses a Kumasi/\n")
+    out.write("--   Ashanti telephone prefix rather than Tamale's, and is disputed\n")
+    out.write("--   by an independent aggregator. See the DISCREPANCY comment next\n")
+    out.write("--   to GNFS_COMMANDS['northern'] in build_seed.py for detail.\n")
+    out.write("--\n")
     out.write("--   Contact numbers are regional command lines, not per-station\n")
     out.write("--   direct lines, and were archived in 2022.\n")
     out.write("--\n")
@@ -158,6 +172,7 @@ def main():
     out.write("-- OSM data is ODbL: attribution and share-alike obligations apply\n")
     out.write("-- to derived databases. Resolve licensing before shipping.\n\n")
     out.write("BEGIN;\n\n")
+    out.write("DELETE FROM submissions WHERE station_id IS NOT NULL;\n")
     out.write("DELETE FROM station_contacts;\n")
     out.write("DELETE FROM stations;\n\n")
 

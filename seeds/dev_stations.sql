@@ -11,6 +11,13 @@
 --   reliability. No GNFS response-rate data is published. The
 --   field name overstates what these values mean.
 --
+--   EXCEPTION: for Northern-region stations, the order above is
+--   deliberately inverted relative to the source page, because the
+--   source's first-listed number (0322022864) uses a Kumasi/
+--   Ashanti telephone prefix rather than Tamale's, and is disputed
+--   by an independent aggregator. See the DISCREPANCY comment next
+--   to GNFS_COMMANDS['northern'] in build_seed.py for detail.
+--
 --   Contact numbers are regional command lines, not per-station
 --   direct lines, and were archived in 2022.
 --
@@ -22,6 +29,7 @@
 
 BEGIN;
 
+DELETE FROM submissions WHERE station_id IS NOT NULL;
 DELETE FROM station_contacts;
 DELETE FROM stations;
 
