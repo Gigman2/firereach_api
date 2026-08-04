@@ -45,14 +45,15 @@ type StationContactResponse struct {
 }
 
 type StationResponse struct {
-	ID       string                   `json:"id"`
-	Name     string                   `json:"name"`
-	Region   string                   `json:"region"`
-	District string                   `json:"district"`
-	Lat      float64                  `json:"lat"`
-	Lng      float64                  `json:"lng"`
-	Contacts []StationContactResponse `json:"contacts"`
-	Distance float64                  `json:"distance,omitempty"`
+	ID             string                   `json:"id"`
+	Name           string                   `json:"name"`
+	Region         string                   `json:"region"`
+	District       string                   `json:"district"`
+	Lat            float64                  `json:"lat"`
+	Lng            float64                  `json:"lng"`
+	DistanceMeters int                      `json:"distance_meters"`
+	PrimaryPhone   string                   `json:"primary_phone"`
+	Contacts       []StationContactResponse `json:"contacts"`
 }
 
 func ToStationResponse(s domain.Station) StationResponse {
@@ -65,13 +66,15 @@ func ToStationResponse(s domain.Station) StationResponse {
 		}
 	}
 	return StationResponse{
-		ID:       s.ID,
-		Name:     s.Name,
-		Region:   s.Region,
-		District: s.District,
-		Lat:      s.Lat,
-		Lng:      s.Lng,
-		Contacts: contacts,
+		ID:             s.ID,
+		Name:           s.Name,
+		Region:         s.Region,
+		District:       s.District,
+		Lat:            s.Lat,
+		Lng:            s.Lng,
+		DistanceMeters: s.DistanceMeters,
+		PrimaryPhone:   s.PrimaryPhone(),
+		Contacts:       contacts,
 	}
 }
 
