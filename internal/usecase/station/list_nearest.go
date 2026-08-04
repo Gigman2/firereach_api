@@ -25,11 +25,17 @@ func (uc *ListNearestStations) Execute(ctx context.Context, lat, lng float64, li
 }
 
 func sortByDistance(stations []domain.Station, lat, lng float64, limit int) []domain.Station {
+	// Compute once per station rather than inside the comparator, which
+	// previously ran haversine O(n log n) times and discarded every result.
+	for i := range stations {
+		km := haversine(lat, lng, stations[i].Lat, stations[i].Lng)
+		stations[i].DistanceMeters = int(math.Round(km * 1000))
+	}
+
 	sort.Slice(stations, func(i, j int) bool {
-		di := haversine(lat, lng, stations[i].Lat, stations[i].Lng)
-		dj := haversine(lat, lng, stations[j].Lat, stations[j].Lng)
-		return di < dj
+		return stations[i].DistanceMeters < stations[j].DistanceMeters
 	})
+
 	if limit > 0 && limit < len(stations) {
 		stations = stations[:limit]
 	}
