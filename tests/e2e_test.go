@@ -238,6 +238,58 @@ func TestListNearestStations_InvalidLng(t *testing.T) {
 	}
 }
 
+// strconv.ParseFloat accepts "NaN", "Inf" and their variants, and every
+// comparison against NaN is false — so a bare range check lets NaN through.
+// A NaN coordinate makes every haversine result NaN, which rounds to a
+// distance of 0 metres, so the sort order becomes arbitrary and the caller is
+// handed a random station as their "nearest". Reject non-finite coordinates.
+func TestListNearestStations_RejectsNonFiniteAndOutOfRange(t *testing.T) {
+	cases := []struct {
+		name  string
+		query string
+	}{
+		{"lat NaN", "lat=NaN&lng=-0.19"},
+		{"lat nan lowercase", "lat=nan&lng=-0.19"},
+		{"lng NaN", "lat=5.56&lng=NaN"},
+		{"lat Inf", "lat=Inf&lng=-0.19"},
+		{"lng -Inf", "lat=5.56&lng=-Inf"},
+		{"lat above range", "lat=999&lng=-0.19"},
+		{"lat below range", "lat=-91&lng=-0.19"},
+		{"lng above range", "lat=5.56&lng=181"},
+		{"lng below range", "lat=5.56&lng=-181"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			app := newTestApp()
+			w := app.request("GET", "/v1/stations?"+tc.query, nil)
+
+			if w.Code != http.StatusBadRequest {
+				t.Errorf("expected 400 for %q, got %d", tc.query, w.Code)
+			}
+		})
+	}
+}
+
+func TestListNearestStations_AcceptsRangeBoundaries(t *testing.T) {
+	cases := []string{
+		"lat=90&lng=180",
+		"lat=-90&lng=-180",
+		"lat=0&lng=0",
+	}
+
+	for _, query := range cases {
+		t.Run(query, func(t *testing.T) {
+			app := newTestApp()
+			w := app.request("GET", "/v1/stations?"+query, nil)
+
+			if w.Code != http.StatusOK {
+				t.Errorf("expected 200 for %q, got %d", query, w.Code)
+			}
+		})
+	}
+}
+
 func TestGetStation_OK(t *testing.T) {
 	app := newTestApp()
 	w := app.request("GET", "/v1/stations/station-1", nil)

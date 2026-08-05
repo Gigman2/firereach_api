@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -43,7 +44,12 @@ func (h *StationHandler) ListNearest(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lat parameter"})
 		return
 	}
-	if lat < -90 || lat > 90 {
+	// NaN needs its own check: ParseFloat accepts "NaN", and every comparison
+	// against NaN is false, so a bare range test lets it through. It would then
+	// poison every haversine result, rounding each distance to 0 and handing the
+	// caller an arbitrary station as their "nearest". (±Inf fails the range test
+	// on its own.)
+	if math.IsNaN(lat) || lat < -90 || lat > 90 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lat parameter"})
 		return
 	}
@@ -52,7 +58,7 @@ func (h *StationHandler) ListNearest(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lng parameter"})
 		return
 	}
-	if lng < -180 || lng > 180 {
+	if math.IsNaN(lng) || lng < -180 || lng > 180 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lng parameter"})
 		return
 	}
