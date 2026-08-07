@@ -22,22 +22,8 @@ func NewAuthHandler(pool *pgxpool.Pool, jwtSecret string) *AuthHandler {
 	return &AuthHandler{pool: pool, jwtSecret: jwtSecret}
 }
 
-type registerRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
-}
-
-type loginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
-type loginResponse struct {
-	Token string `json:"token"`
-}
-
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req loginRequest
+	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -69,11 +55,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loginResponse{Token: tokenString})
+	c.JSON(http.StatusOK, dto.LoginResponse{Token: tokenString})
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
-	var req registerRequest
+	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -95,7 +81,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": id, "email": req.Email})
+	c.JSON(http.StatusCreated, dto.CreatedAdminResponse{ID: id, Email: req.Email})
 }
 
 func (h *AuthHandler) List(c *gin.Context) {
@@ -143,7 +129,7 @@ func (h *AuthHandler) Setup(c *gin.Context) {
 		return
 	}
 
-	var req registerRequest
+	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -165,5 +151,5 @@ func (h *AuthHandler) Setup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": id, "email": req.Email})
+	c.JSON(http.StatusCreated, dto.CreatedAdminResponse{ID: id, Email: req.Email})
 }

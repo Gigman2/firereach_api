@@ -45,7 +45,7 @@ func (h *SubmissionHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "submission created"})
+	c.JSON(http.StatusCreated, dto.MessageResponse{Message: "submission created"})
 }
 
 func (h *SubmissionHandler) ListPending(c *gin.Context) {
@@ -81,5 +81,5 @@ func (h *SubmissionHandler) Review(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "submission reviewed"})
+	c.JSON(http.StatusOK, dto.MessageResponse{Message: "submission reviewed"})
 }

@@ -159,7 +159,7 @@ func (h *StationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "station updated"})
+	c.JSON(http.StatusOK, dto.MessageResponse{Message: "station updated"})
 }
 
 func (h *StationHandler) Deactivate(c *gin.Context) {
@@ -174,5 +174,5 @@ func (h *StationHandler) Deactivate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "station deactivated"})
+	c.JSON(http.StatusOK, dto.MessageResponse{Message: "station deactivated"})
 }
