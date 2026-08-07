@@ -482,6 +482,11 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: Opaque per-device identifier. Rate limiting keys on this header;
+          without it the limit is shared across everyone behind the same IP.
+        in: header
+        name: X-Device-Hash
+        type: string
       - description: Question and optional topic
         in: body
         name: request
@@ -709,6 +714,11 @@ paths:
       description: Community-reported correction. Enters a pending queue for admin
         review.
       parameters:
+      - description: Opaque per-device identifier. Rate limiting keys on this header;
+          without it the limit is shared across everyone behind the same IP.
+        in: header
+        name: X-Device-Hash
+        type: string
       - description: Correction details
         in: body
         name: request
@@ -739,7 +749,7 @@ paths:
       - submissions
 securityDefinitions:
   BearerAuth:
-    description: JWT issued by POST /v1/auth/login. Send as "Bearer <token>".
+    description: JWT issued by POST /v1/auth/login. Send as "Bearer {token}".
     in: header
     name: Authorization
     type: apiKey

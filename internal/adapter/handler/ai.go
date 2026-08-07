@@ -24,6 +24,7 @@ func NewAIHandler(a *ai.AskAI) *AIHandler {
 // @Tags         ai
 // @Accept       json
 // @Produce      json
+// @Param        X-Device-Hash  header    string  false  "Opaque per-device identifier. Rate limiting keys on this header; without it the limit is shared across everyone behind the same IP."
 // @Param        request  body      dto.AskAIRequest  true  "Question and optional topic"
 // @Success      200      {object}  dto.AskAIResponse
 // @Failure      400      {object}  dto.ErrorResponse

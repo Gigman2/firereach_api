@@ -25,7 +25,7 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in                         header
 // @name                       Authorization
-// @description                JWT issued by POST /v1/auth/login. Send as "Bearer <token>".
+// @description                JWT issued by POST /v1/auth/login. Send as "Bearer {token}".
 func main() {
 	// 1. Load config
 	cfg, err := config.Load()

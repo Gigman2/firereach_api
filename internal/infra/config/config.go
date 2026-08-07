@@ -24,7 +24,7 @@ func Load() (*Config, error) {
 		DatabaseURL:  os.Getenv("DATABASE_URL"),
 		ClaudeAPIKey: os.Getenv("CLAUDE_API_KEY"),
 		JWTSecret:    os.Getenv("JWT_SECRET"),
-		Environment:  getEnv("ENVIRONMENT", "development"),
+		Environment:  getEnv("ENVIRONMENT", "production"),
 	}
 
 	if cfg.DatabaseURL == "" {

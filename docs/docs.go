@@ -418,6 +418,12 @@ const docTemplate = `{
                 "summary": "Ask the safety assistant a question",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Opaque per-device identifier. Rate limiting keys on this header; without it the limit is shared across everyone behind the same IP.",
+                        "name": "X-Device-Hash",
+                        "in": "header"
+                    },
+                    {
                         "description": "Question and optional topic",
                         "name": "request",
                         "in": "body",
@@ -759,6 +765,12 @@ const docTemplate = `{
                 ],
                 "summary": "Submit a correction to station data",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Opaque per-device identifier. Rate limiting keys on this header; without it the limit is shared across everyone behind the same IP.",
+                        "name": "X-Device-Hash",
+                        "in": "header"
+                    },
                     {
                         "description": "Correction details",
                         "name": "request",
@@ -1137,7 +1149,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "JWT issued by POST /v1/auth/login. Send as \"Bearer \u003ctoken\u003e\".",
+            "description": "JWT issued by POST /v1/auth/login. Send as \"Bearer {token}\".",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

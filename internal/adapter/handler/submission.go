@@ -27,6 +27,7 @@ func NewSubmissionHandler(c *submission.CreateSubmission, lp *submission.ListPen
 // @Tags         submissions
 // @Accept       json
 // @Produce      json
+// @Param        X-Device-Hash  header    string  false  "Opaque per-device identifier. Rate limiting keys on this header; without it the limit is shared across everyone behind the same IP."
 // @Param        request  body      dto.CreateSubmissionRequest  true  "Correction details"
 // @Success      201      {object}  dto.MessageResponse
 // @Failure      400      {object}  dto.ErrorResponse

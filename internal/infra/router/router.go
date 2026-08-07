@@ -20,7 +20,7 @@ import (
 // or misspelled ENVIRONMENT must fail CLOSED. A missing docs UI in development
 // gets noticed in minutes; a docs UI exposed in production does not.
 var docsEnvironments = map[string]bool{
-	"":            true, // unset — local `go run` with no .env
+	"":            true, // only reachable via a directly-constructed Config (test harness); config.Load() defaults to "production", never ""
 	"development": true,
 	"staging":     true,
 	"test":        true,

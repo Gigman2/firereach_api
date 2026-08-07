@@ -115,3 +115,52 @@ func TestSwaggerSpec_DocumentsNoPhantomRoutes(t *testing.T) {
 			strings.Join(phantom, "\n  "))
 	}
 }
+
+// swaggerSecurity reads the committed spec and returns, for every
+// "METHOD path" operation, whether it carries a non-empty "security" array.
+func swaggerSecurity(t *testing.T) map[string]bool {
+	t.Helper()
+
+	blob, err := os.ReadFile("../docs/swagger.json")
+	if err != nil {
+		t.Fatalf("cannot read committed spec — run `make swagger`: %v", err)
+	}
+
+	var spec struct {
+		Paths map[string]map[string]struct {
+			Security []map[string][]string `json:"security"`
+		} `json:"paths"`
+	}
+	if err := json.Unmarshal(blob, &spec); err != nil {
+		t.Fatalf("spec is not valid JSON: %v", err)
+	}
+
+	secured := make(map[string]bool)
+	for path, methods := range spec.Paths {
+		for method, op := range methods {
+			secured[strings.ToUpper(method)+" "+path] = len(op.Security) > 0
+		}
+	}
+	return secured
+}
+
+func TestSwaggerSpec_AdminRoutesRequireAuth(t *testing.T) {
+	secured := swaggerSecurity(t)
+
+	for key, hasSecurity := range secured {
+		// key is "METHOD /path" — path already includes the /admin prefix
+		// when present, without the basePath.
+		parts := strings.SplitN(key, " ", 2)
+		path := parts[1]
+
+		if strings.HasPrefix(path, "/admin") {
+			if !hasSecurity {
+				t.Errorf("admin route %q is missing a @Security annotation in docs/swagger.json", key)
+			}
+		} else {
+			if hasSecurity {
+				t.Errorf("non-admin route %q unexpectedly carries a security requirement in docs/swagger.json", key)
+			}
+		}
+	}
+}
