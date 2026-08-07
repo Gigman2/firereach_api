@@ -3,6 +3,11 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/firereach/api/docs"
+
 	"github.com/firereach/api/internal/adapter/handler"
 	"github.com/firereach/api/internal/infra/config"
 	"github.com/firereach/api/internal/infra/router/middleware"
@@ -21,6 +26,12 @@ func New(
 
 	r.Use(middleware.Logger())
 	r.Use(middleware.CORS())
+
+	// Interactive API documentation. Withheld in production so the admin route
+	// surface, the auth scheme, and internal error strings are not published.
+	if cfg.Environment != "production" {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	v1 := r.Group("/v1")
 	{

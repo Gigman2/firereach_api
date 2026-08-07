@@ -1,0 +1,19 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Emergency fire-station lookup and community reporting for Ghana.\nStation data is development seed data and is NOT verified for emergency use.",
+        "title": "FireReach API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/v1",
+    "paths": {},
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "JWT issued by POST /v1/auth/login. Send as \"Bearer \u003ctoken\u003e\".",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

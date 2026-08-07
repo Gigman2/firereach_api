@@ -31,6 +31,10 @@ type testApp struct {
 }
 
 func newTestApp() *testApp {
+	return newTestAppWithEnv("")
+}
+
+func newTestAppWithEnv(env string) *testApp {
 	gin.SetMode(gin.TestMode)
 
 	stationRepo := &mocks.StationRepo{
@@ -142,7 +146,7 @@ func newTestApp() *testApp {
 	aiH := handler.NewAIHandler(askAI)
 	authH := handler.NewAuthHandler(nil, "test-jwt-secret")
 
-	cfg := &config.Config{JWTSecret: "test-jwt-secret"}
+	cfg := &config.Config{JWTSecret: "test-jwt-secret", Environment: env}
 	r := router.New(cfg, stationH, submissionH, contentH, aiH, authH)
 
 	return &testApp{

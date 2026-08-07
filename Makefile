@@ -1,7 +1,7 @@
 include .env
 export
 
-.PHONY: run dev build test migrate-up migrate-down generate docker-up docker-down seed
+.PHONY: run dev build test migrate-up migrate-down generate docker-up docker-down seed swagger
 
 run:
 	go run ./cmd/api
@@ -35,3 +35,6 @@ tidy:
 
 seed:
 	docker compose exec -T db psql -v ON_ERROR_STOP=1 -U firereach -d firereach < seeds/dev_stations.sql
+
+swagger:
+	go tool swag init -g cmd/api/main.go

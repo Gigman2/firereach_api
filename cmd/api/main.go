@@ -16,6 +16,16 @@ import (
 	submissionuc "github.com/firereach/api/internal/usecase/submission"
 )
 
+// @title           FireReach API
+// @version         1.0
+// @description     Emergency fire-station lookup and community reporting for Ghana.
+// @description     Station data is development seed data and is NOT verified for emergency use.
+// @BasePath        /v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in                         header
+// @name                       Authorization
+// @description                JWT issued by POST /v1/auth/login. Send as "Bearer <token>".
 func main() {
 	// 1. Load config
 	cfg, err := config.Load()
