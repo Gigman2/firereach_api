@@ -14,7 +14,7 @@
 - **Branch:** `feature/swagger-docs`, which sits on top of `feature/api-wiring`. Commit there. Never commit to `main`, never switch branches.
 - **Spec:** `docs/superpowers/specs/2026-08-07-swagger-design.md`. Read it before starting.
 - **No response shape, status code, or route may change.** Every edit in Task 1 is wire-identical by construction.
-- **No existing test may be modified to accommodate a change.** The existing suite passing unmodified is the proof that nothing moved. If a test needs editing, the change is wrong — stop and report.
+- **No existing test's assertions may be modified to accommodate a change.** The existing suite passing is the proof that nothing moved. If an assertion needs editing to keep a test green, the change is wrong — stop and report. This does not forbid touching test *scaffolding*: Task 2 Step 6 deliberately refactors the `newTestApp` constructor in `tests/e2e_test.go` to accept an environment, which changes no assertion and leaves every existing call site compiling unchanged.
 - **The 46 `gin.H{"error": ...}` call sites in handlers and the 6 in `internal/infra/router/middleware/` stay exactly as they are.** They are documented by annotation, not rewritten.
 - **`@Router` paths are relative to the `/v1` base path** — write `/stations`, never `/v1/stations`.
 - Verification is `go build ./... && go vet ./... && go test ./...`.
