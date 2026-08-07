@@ -19,6 +19,17 @@ func NewAIHandler(a *ai.AskAI) *AIHandler {
 	return &AIHandler{askAI: a}
 }
 
+// Ask godoc
+// @Summary      Ask the safety assistant a question
+// @Tags         ai
+// @Accept       json
+// @Produce      json
+// @Param        request  body      dto.AskAIRequest  true  "Question and optional topic"
+// @Success      200      {object}  dto.AskAIResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      429      {object}  dto.ErrorResponse  "Rate limited"
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /ai/ask [post]
 func (h *AIHandler) Ask(c *gin.Context) {
 	var req dto.AskAIRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

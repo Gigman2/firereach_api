@@ -22,6 +22,18 @@ func NewAuthHandler(pool *pgxpool.Pool, jwtSecret string) *AuthHandler {
 	return &AuthHandler{pool: pool, jwtSecret: jwtSecret}
 }
 
+// Login godoc
+// @Summary      Authenticate an admin
+// @Description  Returns a JWT valid for 24 hours.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      dto.LoginRequest  true  "Credentials"
+// @Success      200      {object}  dto.LoginResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      401      {object}  dto.ErrorResponse  "Invalid credentials"
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -113,7 +125,19 @@ func (h *AuthHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.ToAdminUserListResponse(users))
 }
 
-// Setup creates the first admin account. Only works when no admins exist.
+// Setup godoc
+// @Summary      Create the first admin account
+// @Description  One-time bootstrap. Returns 403 once any admin exists.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      dto.RegisterRequest  true  "Credentials for the first admin"
+// @Success      201      {object}  dto.CreatedAdminResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      403      {object}  dto.ErrorResponse  "Setup already completed"
+// @Failure      409      {object}  dto.ErrorResponse  "Email already registered"
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /auth/setup [post]
 func (h *AuthHandler) Setup(c *gin.Context) {
 	var count int
 	err := h.pool.QueryRow(c.Request.Context(),

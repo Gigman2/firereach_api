@@ -21,6 +21,18 @@ func NewSubmissionHandler(c *submission.CreateSubmission, lp *submission.ListPen
 	return &SubmissionHandler{create: c, listPending: lp, review: r}
 }
 
+// Create godoc
+// @Summary      Submit a correction to station data
+// @Description  Community-reported correction. Enters a pending queue for admin review.
+// @Tags         submissions
+// @Accept       json
+// @Produce      json
+// @Param        request  body      dto.CreateSubmissionRequest  true  "Correction details"
+// @Success      201      {object}  dto.MessageResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      429      {object}  dto.ErrorResponse  "Rate limited"
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /submissions [post]
 func (h *SubmissionHandler) Create(c *gin.Context) {
 	var req dto.CreateSubmissionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

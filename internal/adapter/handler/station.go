@@ -38,6 +38,18 @@ func NewStationHandler(
 	}
 }
 
+// ListNearest godoc
+// @Summary      List nearest fire stations
+// @Description  Returns active stations ordered by distance from the supplied coordinates, nearest first.
+// @Tags         stations
+// @Produce      json
+// @Param        lat    query     number  true   "Latitude, -90 to 90"
+// @Param        lng    query     number  true   "Longitude, -180 to 180"
+// @Param        limit  query     integer false  "Maximum results (default 3)"
+// @Success      200    {array}   dto.StationResponse
+// @Failure      400    {object}  dto.ErrorResponse  "Missing, unparseable, NaN, or out-of-range coordinate"
+// @Failure      500    {object}  dto.ErrorResponse
+// @Router       /stations [get]
 func (h *StationHandler) ListNearest(c *gin.Context) {
 	lat, err := strconv.ParseFloat(c.Query("lat"), 64)
 	if err != nil {
@@ -79,6 +91,16 @@ func (h *StationHandler) ListNearest(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.ToStationListResponse(stations))
 }
 
+// GetByID godoc
+// @Summary      Get a station by ID
+// @Description  Returns one station. distance_meters is 0 here, since no reference coordinate is supplied.
+// @Tags         stations
+// @Produce      json
+// @Param        id   path      string  true  "Station UUID"
+// @Success      200  {object}  dto.StationResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /stations/{id} [get]
 func (h *StationHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 

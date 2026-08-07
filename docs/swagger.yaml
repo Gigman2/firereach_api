@@ -1,4 +1,134 @@
 basePath: /v1
+definitions:
+  dto.AskAIRequest:
+    properties:
+      question:
+        type: string
+      topic:
+        type: string
+    required:
+    - question
+    type: object
+  dto.AskAIResponse:
+    properties:
+      answer:
+        type: string
+    type: object
+  dto.ContentResponse:
+    properties:
+      body:
+        type: string
+      category:
+        type: string
+      contextual_trigger:
+        type: string
+      id:
+        type: string
+      steps:
+        items:
+          type: string
+        type: array
+      subcategory:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  dto.CreateSubmissionRequest:
+    properties:
+      device_hash:
+        type: string
+      note:
+        type: string
+      station_id:
+        type: string
+      suggested_value:
+        type: string
+      type:
+        type: string
+    required:
+    - device_hash
+    - suggested_value
+    - type
+    type: object
+  dto.CreatedAdminResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  dto.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.StationContactResponse:
+    properties:
+      active:
+        type: boolean
+      phone:
+        type: string
+      response_rate:
+        type: number
+    type: object
+  dto.StationResponse:
+    properties:
+      contacts:
+        items:
+          $ref: '#/definitions/dto.StationContactResponse'
+        type: array
+      distance_meters:
+        type: integer
+      district:
+        type: string
+      id:
+        type: string
+      lat:
+        type: number
+      lng:
+        type: number
+      name:
+        type: string
+      primary_phone:
+        type: string
+      region:
+        type: string
+    type: object
 info:
   contact: {}
   description: |-
@@ -6,7 +136,267 @@ info:
     Station data is development seed data and is NOT verified for emergency use.
   title: FireReach API
   version: "1.0"
-paths: {}
+paths:
+  /ai/ask:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Question and optional topic
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AskAIRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AskAIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "429":
+          description: Rate limited
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Ask the safety assistant a question
+      tags:
+      - ai
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Returns a JWT valid for 24 hours.
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Authenticate an admin
+      tags:
+      - auth
+  /auth/setup:
+    post:
+      consumes:
+      - application/json
+      description: One-time bootstrap. Returns 403 once any admin exists.
+      parameters:
+      - description: Credentials for the first admin
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreatedAdminResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Setup already completed
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Email already registered
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Create the first admin account
+      tags:
+      - auth
+  /content:
+    get:
+      parameters:
+      - description: Filter by category
+        in: query
+        name: category
+        type: string
+      - description: Filter by subcategory
+        in: query
+        name: subcategory
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ContentResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: List safety content
+      tags:
+      - content
+  /content/{id}:
+    get:
+      parameters:
+      - description: Content ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ContentResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get a safety content item by ID
+      tags:
+      - content
+  /stations:
+    get:
+      description: Returns active stations ordered by distance from the supplied coordinates,
+        nearest first.
+      parameters:
+      - description: Latitude, -90 to 90
+        in: query
+        name: lat
+        required: true
+        type: number
+      - description: Longitude, -180 to 180
+        in: query
+        name: lng
+        required: true
+        type: number
+      - description: Maximum results (default 3)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.StationResponse'
+            type: array
+        "400":
+          description: Missing, unparseable, NaN, or out-of-range coordinate
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: List nearest fire stations
+      tags:
+      - stations
+  /stations/{id}:
+    get:
+      description: Returns one station. distance_meters is 0 here, since no reference
+        coordinate is supplied.
+      parameters:
+      - description: Station UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StationResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get a station by ID
+      tags:
+      - stations
+  /submissions:
+    post:
+      consumes:
+      - application/json
+      description: Community-reported correction. Enters a pending queue for admin
+        review.
+      parameters:
+      - description: Correction details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSubmissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "429":
+          description: Rate limited
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Submit a correction to station data
+      tags:
+      - submissions
 securityDefinitions:
   BearerAuth:
     description: JWT issued by POST /v1/auth/login. Send as "Bearer <token>".
