@@ -1,5 +1,14 @@
 basePath: /v1
 definitions:
+  dto.AdminUserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+    type: object
   dto.AskAIRequest:
     properties:
       question:
@@ -13,6 +22,17 @@ definitions:
     properties:
       answer:
         type: string
+    type: object
+  dto.ContactInput:
+    properties:
+      active:
+        type: boolean
+      phone:
+        type: string
+      response_rate:
+        type: number
+    required:
+    - phone
     type: object
   dto.ContentResponse:
     properties:
@@ -36,6 +56,31 @@ definitions:
         type: array
       title:
         type: string
+    type: object
+  dto.CreateStationRequest:
+    properties:
+      contacts:
+        items:
+          $ref: '#/definitions/dto.ContactInput'
+        minItems: 1
+        type: array
+      district:
+        type: string
+      lat:
+        type: number
+      lng:
+        type: number
+      name:
+        type: string
+      region:
+        type: string
+    required:
+    - contacts
+    - district
+    - lat
+    - lng
+    - name
+    - region
     type: object
   dto.CreateSubmissionRequest:
     properties:
@@ -97,6 +142,15 @@ definitions:
     - email
     - password
     type: object
+  dto.ReviewSubmissionRequest:
+    properties:
+      admin_note:
+        type: string
+      status:
+        type: string
+    required:
+    - status
+    type: object
   dto.StationContactResponse:
     properties:
       active:
@@ -129,6 +183,44 @@ definitions:
       region:
         type: string
     type: object
+  dto.SubmissionResponse:
+    properties:
+      admin_note:
+        type: string
+      device_hash:
+        type: string
+      id:
+        type: string
+      note:
+        type: string
+      station_id:
+        type: string
+      status:
+        type: string
+      submitted_at:
+        type: string
+      suggested_value:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.UpdateStationRequest:
+    properties:
+      contacts:
+        items:
+          $ref: '#/definitions/dto.ContactInput'
+        type: array
+      district:
+        type: string
+      lat:
+        type: number
+      lng:
+        type: number
+      name:
+        type: string
+      region:
+        type: string
+    type: object
 info:
   contact: {}
   description: |-
@@ -137,6 +229,254 @@ info:
   title: FireReach API
   version: "1.0"
 paths:
+  /admin/stations:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Station details, at least one contact required
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateStationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.StationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a fire station
+      tags:
+      - admin
+      - stations
+  /admin/stations/{id}:
+    delete:
+      description: Soft delete. The station stops appearing in nearest-station results.
+      parameters:
+      - description: Station UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Deactivate a fire station
+      tags:
+      - admin
+      - stations
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Station UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateStationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a fire station
+      tags:
+      - admin
+      - stations
+  /admin/submissions:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SubmissionResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List pending submissions
+      tags:
+      - admin
+      - submissions
+  /admin/submissions/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Submission UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Review decision
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReviewSubmissionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Approve or reject a submission
+      tags:
+      - admin
+      - submissions
+  /admin/users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.AdminUserResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List admin accounts
+      tags:
+      - admin
+      - auth
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreatedAdminResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Email already registered
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create an admin account
+      tags:
+      - admin
+      - auth
   /ai/ask:
     post:
       consumes:

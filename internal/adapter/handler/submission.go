@@ -60,6 +60,15 @@ func (h *SubmissionHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, dto.MessageResponse{Message: "submission created"})
 }
 
+// ListPending godoc
+// @Summary      List pending submissions
+// @Tags         admin, submissions
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {array}   dto.SubmissionResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /admin/submissions [get]
 func (h *SubmissionHandler) ListPending(c *gin.Context) {
 	subs, err := h.listPending.Execute(c.Request.Context())
 	if err != nil {
@@ -70,6 +79,20 @@ func (h *SubmissionHandler) ListPending(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.ToSubmissionListResponse(subs))
 }
 
+// Review godoc
+// @Summary      Approve or reject a submission
+// @Tags         admin, submissions
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id       path      string                       true  "Submission UUID"
+// @Param        request  body      dto.ReviewSubmissionRequest  true  "Review decision"
+// @Success      200      {object}  dto.MessageResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      401      {object}  dto.ErrorResponse
+// @Failure      404      {object}  dto.ErrorResponse
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /admin/submissions/{id} [patch]
 func (h *SubmissionHandler) Review(c *gin.Context) {
 	id := c.Param("id")
 

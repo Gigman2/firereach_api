@@ -117,6 +117,18 @@ func (h *StationHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.ToStationResponse(*s))
 }
 
+// Create godoc
+// @Summary      Create a fire station
+// @Tags         admin, stations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      dto.CreateStationRequest  true  "Station details, at least one contact required"
+// @Success      201      {object}  dto.StationResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      401      {object}  dto.ErrorResponse
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /admin/stations [post]
 func (h *StationHandler) Create(c *gin.Context) {
 	var req dto.CreateStationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -147,6 +159,20 @@ func (h *StationHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, dto.ToStationResponse(*created))
 }
 
+// Update godoc
+// @Summary      Update a fire station
+// @Tags         admin, stations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id       path      string                    true  "Station UUID"
+// @Param        request  body      dto.UpdateStationRequest  true  "Fields to update"
+// @Success      200      {object}  dto.MessageResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      401      {object}  dto.ErrorResponse
+// @Failure      404      {object}  dto.ErrorResponse
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /admin/stations/{id} [patch]
 func (h *StationHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
@@ -184,6 +210,18 @@ func (h *StationHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.MessageResponse{Message: "station updated"})
 }
 
+// Deactivate godoc
+// @Summary      Deactivate a fire station
+// @Description  Soft delete. The station stops appearing in nearest-station results.
+// @Tags         admin, stations
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path      string  true  "Station UUID"
+// @Success      200  {object}  dto.MessageResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /admin/stations/{id} [delete]
 func (h *StationHandler) Deactivate(c *gin.Context) {
 	id := c.Param("id")
 

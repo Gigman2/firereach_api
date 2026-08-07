@@ -70,6 +70,19 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.LoginResponse{Token: tokenString})
 }
 
+// Register godoc
+// @Summary      Create an admin account
+// @Tags         admin, auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      dto.RegisterRequest  true  "Credentials"
+// @Success      201      {object}  dto.CreatedAdminResponse
+// @Failure      400      {object}  dto.ErrorResponse
+// @Failure      401      {object}  dto.ErrorResponse
+// @Failure      409      {object}  dto.ErrorResponse  "Email already registered"
+// @Failure      500      {object}  dto.ErrorResponse
+// @Router       /admin/users [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -96,6 +109,15 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, dto.CreatedAdminResponse{ID: id, Email: req.Email})
 }
 
+// List godoc
+// @Summary      List admin accounts
+// @Tags         admin, auth
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {array}   dto.AdminUserResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /admin/users [get]
 func (h *AuthHandler) List(c *gin.Context) {
 	var users []domain.AdminUser
 
