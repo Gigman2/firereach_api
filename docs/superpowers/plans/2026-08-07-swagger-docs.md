@@ -876,8 +876,8 @@ Expected: all pass.
 
 ```bash
 docker compose up -d --build api && sleep 6
-curl -s -o /dev/null -w "swagger UI: %{http_code}\n" http://localhost:8080/swagger/index.html
-curl -s -o /dev/null -w "spec JSON:  %{http_code}\n" http://localhost:8080/swagger/doc.json
+curl -s -o /dev/null -w "swagger UI: %{http_code}\n" http://localhost:9000/swagger/index.html
+curl -s -o /dev/null -w "spec JSON:  %{http_code}\n" http://localhost:9000/swagger/doc.json
 ```
 
 Expected: both 200. The compose environment is `development`, so the route is mounted.

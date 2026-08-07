@@ -2,13 +2,13 @@ services:
   api:
     build: .
     ports:
-      - "8080:8080"
+      - "9000:9000"
     environment:
       - DATABASE_URL=postgres://firereach:firereach@db:5432/firereach?sslmode=disable
       - CLAUDE_API_KEY=${CLAUDE_API_KEY}
       - JWT_SECRET=${JWT_SECRET}
       - ENVIRONMENT=development
-      - PORT=8080
+      - PORT=9000
     depends_on:
       db:
         condition: service_healthy
