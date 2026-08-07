@@ -1,6 +1,8 @@
 package router
 
 import (
+	"strings"
+
 	"github.com/gin-gonic/gin"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -12,6 +14,17 @@ import (
 	"github.com/firereach/api/internal/infra/config"
 	"github.com/firereach/api/internal/infra/router/middleware"
 )
+
+// Environments permitted to serve the interactive API docs. This is an
+// allow-list rather than a "not production" check on purpose: an unrecognized
+// or misspelled ENVIRONMENT must fail CLOSED. A missing docs UI in development
+// gets noticed in minutes; a docs UI exposed in production does not.
+var docsEnvironments = map[string]bool{
+	"":            true, // unset — local `go run` with no .env
+	"development": true,
+	"staging":     true,
+	"test":        true,
+}
 
 func New(
 	cfg *config.Config,
@@ -29,7 +42,7 @@ func New(
 
 	// Interactive API documentation. Withheld in production so the admin route
 	// surface, the auth scheme, and internal error strings are not published.
-	if cfg.Environment != "production" {
+	if docsEnvironments[strings.ToLower(cfg.Environment)] {
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
