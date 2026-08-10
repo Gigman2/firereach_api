@@ -5,18 +5,274 @@ INSERT INTO safety_content (
     steps, tags, contextual_trigger, sources, content_hash,
     review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
 ) VALUES (
+    'hazard-electrical',
+    'hazard',
+    'electrical',
+    'Electrical Fire Safety',
+    'How to spot bad wiring, overloaded sockets, and generator risks before they start a fire.',
+    'Electrical faults are a common cause of fires in homes and workplaces. Extension boards, long runs of flex, and standby generators all add risk. The precautions below come from the National Fire Protection Association (NFPA) and the Ghana National Fire Service (GNFS).
+
+In the house, shop, or office:
+
+- NFPA says to have all electrical work done by a qualified electrician.
+- NFPA says to plug only one heat-producing appliance — a kettle, iron, or heater — into a socket at a time.
+- NFPA says major appliances such as fridges, washers, and stoves should be plugged directly into a wall socket, and that extension cords and plug strips should not be used for them.
+- NFPA says extension cords are intended for temporary use, and to check that cords are not running across doorways or under carpets.
+- GNFS says to check your electrical cords, and to replace a cord that is damaged in any way.
+- GNFS says not to lay cords where they can be stepped on, as this contributes to deterioration of the protective outside coating.
+- GNFS says not to overload your circuits.
+- GNFS says to turn off electrical appliances at the end of each day, or when they are not in use.
+- GNFS says to keep heat-producing equipment away from anything that might burn.
+
+NFPA says to call a qualified electrician or your landlord if you notice any of these warning signs:
+
+- Fuses blowing or circuit breakers tripping often.
+- A tingling feeling when you touch an electrical appliance.
+- Discoloured or warm wall sockets.
+- A burning or rubbery smell coming from an appliance.
+- Lights flickering or dimming.
+- Sparks from a socket.
+
+Generators burn fuel and give off smoke. WHO reports that in poorly ventilated dwellings, indoor smoke can have levels of fine particles 100 times higher than acceptable. Run a generator in the open air, never in a closed room or a shut-in corner of a compound.
+
+If a fire starts, get everyone out and call 192. GNFS says to call for help before attempting to deal with a serious fire yourself.',
+    '[]'::jsonb,
+    '["electrical","wiring","socket","extension board","generator","power","shock","short circuit","light off"]'::jsonb,
+    NULL,
+    '[{"title":"Electrical Home Fire Safety","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/electrical-safety-in-the-home"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"Household air pollution (fact sheet)","publisher":"World Health Organization","year":"2025","url":"https://www.who.int/news-room/fact-sheets/detail/household-air-pollution-and-health"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"}]'::jsonb,
+    '585ff185f61190f5cc68d27d0d4384a3f6c63849528bb7023c0a3b2f18a9aa90',
+    'pending_review',
+    NULL,           -- reviewer_name
+    NULL,     -- reviewer_credential
+    NULL,
+    NULL
+) ON CONFLICT (slug) DO UPDATE SET
+    category = EXCLUDED.category,
+    subcategory = EXCLUDED.subcategory,
+    title = EXCLUDED.title,
+    summary = EXCLUDED.summary,
+    body = EXCLUDED.body,
+    steps = EXCLUDED.steps,
+    tags = EXCLUDED.tags,
+    contextual_trigger = EXCLUDED.contextual_trigger,
+    sources = EXCLUDED.sources,
+    content_hash = EXCLUDED.content_hash,
+    review_state = EXCLUDED.review_state,
+    reviewer_name = EXCLUDED.reviewer_name,
+    reviewer_credential = EXCLUDED.reviewer_credential,
+    last_reviewed = EXCLUDED.last_reviewed,
+    reviewed_content_hash = EXCLUDED.reviewed_content_hash;
+
+INSERT INTO safety_content (
+    slug, category, subcategory, title, summary, body,
+    steps, tags, contextual_trigger, sources, content_hash,
+    review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
+) VALUES (
     'hazard-cooking',
     'hazard',
     'cooking',
     'Cooking Fire Safety',
-    'Placeholder — replaced in Task 7.',
-    'Placeholder body. Replaced with sourced content in Task 7.',
+    'Staying safe with charcoal, gas, and hot oil — and what to do when a pan catches fire.',
+    'Cooking is one of the leading causes of home fires. Many households here cook on charcoal or bottled gas, often in a shared compound or just outside the room. The precautions below come from NFPA, the Ghana National Fire Service, and WHO.
+
+While you are cooking, NFPA says:
+
+- Stay in the kitchen while you are frying, grilling, boiling, or broiling food.
+- If you are simmering, baking, or roasting, check the food regularly, stay nearby, and use a timer.
+- Do not use the stove or stovetop if you are sleepy or have consumed alcohol.
+- Keep anything that can catch fire — oven mitts, wooden spoons, food packaging, towels, curtains — away from the stovetop.
+- Heat oil slowly, and add food gently so the oil does not splatter.
+- Smoke or a smell from the oil is a danger sign that it is too hot. Turn off the burner, or carefully remove the pan from it.
+- Always cook with a lid beside the pan.
+
+If a pan catches fire:
+
+- NFPA and GNFS both say to turn off the heat and slide a lid over the pan to smother the flames.
+- NFPA says to leave the pan covered until it is completely cooled, and never to throw water on the fire.
+- For an oven fire, NFPA says to turn off the heat and keep the door closed.
+- NFPA says that if the fire does not go out, or you do not feel comfortable sliding a lid over the pan, get everyone out and close the door behind you. Then call 192.
+
+Charcoal, firewood, and kerosene all give off smoke as they burn. WHO reports that in poorly ventilated dwellings, indoor smoke can have levels of fine particles 100 times higher than acceptable. Cook where there is good airflow, and do not burn charcoal in a closed room.',
     '[]'::jsonb,
-    '["cooking"]'::jsonb,
+    '["cooking","kitchen","gas","cylinder","charcoal","coalpot","stove","hot oil","frying","kerosene"]'::jsonb,
     NULL,
-    '[{"title":"Placeholder","publisher":"Placeholder","year":"2026","url":"https://example.org","unverified":true}]'::jsonb,
-    'ef7c103f0e356c0a83ad3ab195ed90c7343a17bf5bb4a7d71837f6f581d3e55d',
-    'draft',
+    '[{"title":"Safety with cooking equipment","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/cooking"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"Household air pollution (fact sheet)","publisher":"World Health Organization","year":"2025","url":"https://www.who.int/news-room/fact-sheets/detail/household-air-pollution-and-health"}]'::jsonb,
+    '0af3c0533f6546ca4feab128c2a9a1c3fc4841e805da650f8c54995309374f4e',
+    'pending_review',
+    NULL,           -- reviewer_name
+    NULL,     -- reviewer_credential
+    NULL,
+    NULL
+) ON CONFLICT (slug) DO UPDATE SET
+    category = EXCLUDED.category,
+    subcategory = EXCLUDED.subcategory,
+    title = EXCLUDED.title,
+    summary = EXCLUDED.summary,
+    body = EXCLUDED.body,
+    steps = EXCLUDED.steps,
+    tags = EXCLUDED.tags,
+    contextual_trigger = EXCLUDED.contextual_trigger,
+    sources = EXCLUDED.sources,
+    content_hash = EXCLUDED.content_hash,
+    review_state = EXCLUDED.review_state,
+    reviewer_name = EXCLUDED.reviewer_name,
+    reviewer_credential = EXCLUDED.reviewer_credential,
+    last_reviewed = EXCLUDED.last_reviewed,
+    reviewed_content_hash = EXCLUDED.reviewed_content_hash;
+
+INSERT INTO safety_content (
+    slug, category, subcategory, title, summary, body,
+    steps, tags, contextual_trigger, sources, content_hash,
+    review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
+) VALUES (
+    'hazard-home',
+    'hazard',
+    'home',
+    'Home Fire Safety',
+    'Cut the risk at home, and make sure everyone can get out in the two minutes a fire gives you.',
+    'Most home fire deaths come down to how fast smoke spreads and how little time there is to get out. NFPA says fire can spread rapidly through your home, leaving you as little as one or two minutes to escape safely once the smoke alarm sounds. The guidance below comes from NFPA, the Ghana National Fire Service, and WHO.
+
+Reduce the risk:
+
+- GNFS says to keep your space free of waste paper, trash, and other items that can easily catch fire.
+- NFPA says to have all electrical work done by a qualified electrician.
+- NFPA says only one heat-producing appliance should be plugged into a socket at a time.
+- GNFS says to turn off electrical appliances when they are not in use.
+- NFPA''s rule for the stovetop applies to any open flame: keep anything that can catch fire away from it. That includes kerosene lamps, candles, and coalpots near curtains, mats, or mattresses.
+
+Be ready to get out. NFPA says:
+
+- Walk through your home and inspect all possible exits and escape routes, marking two ways out of each room, including windows and doors.
+- Check that escape routes are clear and that doors and windows can be opened easily.
+- Choose an outside meeting place a safe distance in front of your home where everyone can meet after they have escaped.
+- If windows or doors have security bars, make sure the bars have emergency release devices inside so they can be opened immediately in an emergency. The same principle applies to a shared compound: the way out must open immediately, not be padlocked shut.
+- Make sure everyone in the household knows the emergency number by heart, so anyone can call from a neighbour''s phone once safely outside. In Ghana that number is 192, toll-free on all networks.
+- Practise the plan twice a year, and make arrangements for anyone in the home who has a disability, and for infants and older adults.
+- A closed door may slow the spread of smoke, heat, and fire. Close doors on your way out.
+
+Smoke inside the home is its own hazard. WHO reports that around 2.1 billion people cook using open fires or inefficient stoves fuelled by kerosene, biomass, and coal. WHO also reports that in poorly ventilated dwellings, indoor smoke can have levels of fine particles 100 times higher than acceptable.',
+    '[]'::jsonb,
+    '["home","house","compound","candle","lantern","kerosene lamp","escape plan","smoke alarm","fire at home"]'::jsonb,
+    NULL,
+    '[{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"},{"title":"Electrical Home Fire Safety","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/electrical-safety-in-the-home"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"Household air pollution (fact sheet)","publisher":"World Health Organization","year":"2025","url":"https://www.who.int/news-room/fact-sheets/detail/household-air-pollution-and-health"}]'::jsonb,
+    'd66e7333ce987e7ad398b5cd93c5169f01709090674a62665de02f673d2a810e',
+    'pending_review',
+    NULL,           -- reviewer_name
+    NULL,     -- reviewer_credential
+    NULL,
+    NULL
+) ON CONFLICT (slug) DO UPDATE SET
+    category = EXCLUDED.category,
+    subcategory = EXCLUDED.subcategory,
+    title = EXCLUDED.title,
+    summary = EXCLUDED.summary,
+    body = EXCLUDED.body,
+    steps = EXCLUDED.steps,
+    tags = EXCLUDED.tags,
+    contextual_trigger = EXCLUDED.contextual_trigger,
+    sources = EXCLUDED.sources,
+    content_hash = EXCLUDED.content_hash,
+    review_state = EXCLUDED.review_state,
+    reviewer_name = EXCLUDED.reviewer_name,
+    reviewer_credential = EXCLUDED.reviewer_credential,
+    last_reviewed = EXCLUDED.last_reviewed,
+    reviewed_content_hash = EXCLUDED.reviewed_content_hash;
+
+INSERT INTO safety_content (
+    slug, category, subcategory, title, summary, body,
+    steps, tags, contextual_trigger, sources, content_hash,
+    review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
+) VALUES (
+    'hazard-workplace',
+    'hazard',
+    'workplace',
+    'Workplace Fire Safety',
+    'The Ghana National Fire Service''s own fire prevention and evacuation guidance for businesses.',
+    'The Ghana National Fire Service says that no matter the type of business you conduct at your workplace, fire safety should always be a major concern, as it remains very important for the sustenance of your business. Almost everything below is GNFS''s own workplace guidance. NFPA advice on extinguishers is added where it agrees.
+
+Fire prevention, from GNFS:
+
+- Keep your work area free of waste paper, trash, and other items that can easily catch fire.
+- Check on your electrical cords. If a cord is damaged in any way, replace it.
+- Try not to lay cords in places where they can be stepped on, as this will contribute to deterioration of the protective outside coating.
+- Do not overload your circuits.
+- Turn off electrical appliances at the end of each day, or when not in use.
+- Keep heat-producing equipment away from anything that might burn. This includes copiers, water dispensers, and computers.
+- Contact your local fire station for a suitable fire extinguisher, and let them help teach staff and install it at the appropriate place on the premises.
+
+In the event of a fire, GNFS says:
+
+- Call 192 immediately, and do not hang up on the emergency responder until you are told to do so. GNFS also publishes 0302 772 446, 0299 340 383, and 112. Save your local fire station number on your phone.
+- Close doors when exiting, to help limit the spread of smoke and fire throughout the building.
+- Never use elevators during an evacuation.
+- Follow an agreed and constantly practised escape plan. Meet at a pre-determined place, an assembly point outside your building and away from danger.
+- Conduct a headcount to ensure all of your staff have evacuated.
+
+If anyone uses an extinguisher, NFPA says to do so only when the fire is confined to a small area and is not growing, everyone has exited the building, the fire department has been called or is being called, and the room is not filled with smoke. GNFS says the best way to ensure the safety of your staff is through fire prevention and preparation. GNFS asks employers to talk with staff about fire safety, or contact their local fire station for fire safety education.',
+    '[]'::jsonb,
+    '["workplace","office","shop","market","business","staff","assembly point","fire drill","fire certificate"]'::jsonb,
+    NULL,
+    '[{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"Fire extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/fire-extinguishers"}]'::jsonb,
+    '0a0eb89f3ff6d421378b8ffca5f4ac5f86ed552b19a0b46ac9a595e586cca18d',
+    'pending_review',
+    NULL,           -- reviewer_name
+    NULL,     -- reviewer_credential
+    NULL,
+    NULL
+) ON CONFLICT (slug) DO UPDATE SET
+    category = EXCLUDED.category,
+    subcategory = EXCLUDED.subcategory,
+    title = EXCLUDED.title,
+    summary = EXCLUDED.summary,
+    body = EXCLUDED.body,
+    steps = EXCLUDED.steps,
+    tags = EXCLUDED.tags,
+    contextual_trigger = EXCLUDED.contextual_trigger,
+    sources = EXCLUDED.sources,
+    content_hash = EXCLUDED.content_hash,
+    review_state = EXCLUDED.review_state,
+    reviewer_name = EXCLUDED.reviewer_name,
+    reviewer_credential = EXCLUDED.reviewer_credential,
+    last_reviewed = EXCLUDED.last_reviewed,
+    reviewed_content_hash = EXCLUDED.reviewed_content_hash;
+
+INSERT INTO safety_content (
+    slug, category, subcategory, title, summary, body,
+    steps, tags, contextual_trigger, sources, content_hash,
+    review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
+) VALUES (
+    'hazard-seasonal',
+    'hazard',
+    'seasonal',
+    'Dry Season and Bush Fire Safety',
+    'Harmattan brings dry grass and wind. What the law says about bush fires, and how to protect your place.',
+    'In the dry harmattan months the air is dry and the wind is strong, and grass, bush, and farm waste catch easily. A fire that starts in the bush can reach homes, farms, fuel stores, and market sheds quickly. The guidance below comes from Ghanaian law and from GNFS and NFPA fire safety advice.
+
+What the law says. Under the Control and Prevention of Bushfires Act, 1990 (P.N.D.C.L. 229):
+
+- Except as otherwise provided under the Act, it is unlawful for any person to start a bushfire for any purpose.
+- A person starts a bushfire if an action of that person results in the uncontrolled burning of any farm, forest, or grassland.
+- A Bushfire Control Subcommittee is established in each district. It may make by-laws for the control of bushfires, indicate burning seasons, and draw up burning programmes.
+- Before any burning, find out what your district''s by-laws and burning season allow. Do not assume.
+
+Around your home, farm, shop, or shed:
+
+- GNFS says to keep your area free of waste paper, trash, and other items that can easily catch fire.
+- NFPA''s rule for the stovetop applies outdoors too: keep anything that can catch fire away from any open flame.
+- NFPA says to check that escape routes are clear and that doors and windows can be opened easily.
+
+If a bush or grass fire starts near you:
+
+- Call 192 straight away. GNFS says to call for help before attempting to extinguish a serious fire.
+- GNFS says not to attempt to put out a fire where it is emitting toxic smoke. If you suspect the smoke is toxic, or simply do not know, leave it to the professionals.
+- GNFS says to check that all other people are out and assembled at a safe meeting point.
+- NFPA says to choose an outside meeting place a safe distance in front of the building.',
+    '[]'::jsonb,
+    '["harmattan","dry season","bush fire","bushfire","grass fire","farm","burning","wind","dry grass"]'::jsonb,
+    NULL,
+    '[{"title":"Control and Prevention of Bushfires Act, 1990 (P.N.D.C.L. 229)","publisher":"Republic of Ghana","year":"1990","url":"https://www.ecolex.org/details/legislation/control-and-prevention-of-bushfires-act-1990-pndcl-229-lex-faoc040958/"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"}]'::jsonb,
+    '0cb1f79adbbd883707bc70b6583b8d5f760359444087ff2b5941acc4c6158636',
+    'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
     NULL,
@@ -47,14 +303,128 @@ INSERT INTO safety_content (
     'first_aid',
     'burns',
     'Burns',
-    'Placeholder — replaced in Task 7.',
-    'Placeholder body. Replaced with sourced content in Task 7.',
-    '[{"title":"Placeholder step","body":"Replaced in Task 7."}]'::jsonb,
-    '["burns"]'::jsonb,
+    'Cool the burn, keep the person warm, get medical help. From WHO, ANZCOR, and the European Resuscitation Council.',
+    'This is first aid only, for while you wait for help. Every serious burn needs medical care. Sources agree on cooling with running water and on never using ice, but they differ on how long to cool — that difference matters most for children and for large burns, so both positions are shown below.',
+    '[{"title":"Get safe, call 192","body":"Move the person away from the fire, hot liquid, or electricity, but only if it is safe for you to do so. Then call 192 — Ghana National Fire Service, toll-free on all networks. GNFS says to call for help before attempting to deal with a serious fire yourself."},{"title":"Stop the burning","body":"WHO says to stop the burning process by removing clothing and irrigating the burn. ANZCOR says cooling should be commenced as soon as possible, but may help if started up to 3 hours after the burn."},{"title":"Cool with running water","body":"ANZCOR recommends cooling burns as soon as practicable with cool running water. WHO says to use cool running water to reduce the temperature of the burn. ANZCOR says to use any clean cool liquid if water is not available."},{"title":"How long to cool","body":"ANZCOR says the duration of cooling should be at least 20 minutes, and the European Resuscitation Council says to continue cooling for at least 20 minutes in cool or cold — not freezing — water. ILCOR''s systematic review on duration found the evidence inconclusive and states that the optimal duration remains unknown."},{"title":"Keep the person warm","body":"ANZCOR pairs cooling with this instruction, and it is not optional: cover unburnt areas and keep the person warm to reduce the risk of hypothermia, particularly small children, who may develop hypothermia quickly. Cool the burn; do not chill the person."},{"title":"Children and large burns","body":"This is where the sources pull apart, so use extra care. The European Resuscitation Council says care must be taken when cooling large thermal burns or burns in infants and small children so as not to induce hypothermia. WHO says to avoid prolonged cooling with water because it will lead to hypothermia."},{"title":"Cover and transport","body":"WHO says to wrap the person in a clean cloth or sheet and transport them to the nearest appropriate facility for medical care. WHO says not to apply any material directly to the wound, as it might become infected."},{"title":"Never do these","body":"WHO says not to apply ice, because it deepens the injury; ANZCOR says not to use ice or ice water, as further tissue damage may result. WHO says not to apply paste, oil, haldi (turmeric), or raw cotton to the burn, and not to open blisters. WHO says to avoid applying anything topical until the person has been placed under appropriate medical care."},{"title":"Chemical burns","body":"ANZCOR says to thoroughly irrigate a chemical burn with water. ANZCOR then directs the caller to a poisons hotline, but the numbers it lists are for Australia and New Zealand only and do not work here. In Ghana, call 192 and get the person to medical care."}]'::jsonb,
+    '["burn","burns","scald","hot water","hot oil","fire burn","blister","cooling","skin"]'::jsonb,
+    'post_call',
+    '[{"title":"Burns (fact sheet)","publisher":"World Health Organization","year":"2023","url":"https://www.who.int/news-room/fact-sheets/detail/burns"},{"title":"Guideline 9.1.3 – First Aid for Burns","publisher":"Australian and New Zealand Committee on Resuscitation (ANZCOR)","year":"2023","url":"https://www.anzcor.org/home/first-aid/guideline-9-1-3-first-aid-for-burns"},{"title":"European Resuscitation Council Guidelines 2021: First aid (Zideman DA et al., Resuscitation 161:270–290)","publisher":"European Resuscitation Council","year":"2021","url":"https://pubmed.ncbi.nlm.nih.gov/33773828/"},{"title":"Duration of Cooling With Water for Thermal Burns as a First Aid Intervention (FA 770): Systematic Review","publisher":"International Liaison Committee on Resuscitation (ILCOR)","year":"","url":"https://costr.ilcor.org/document/duration-of-cooling-with-water-for-thermal-burns-as-a-first-aid-intervention-fa-770-systematic-review"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"}]'::jsonb,
+    'b4e5ff9dba0254166757ff46ae266009a2ec6b4b35aef14c0cf368d08d701e89',
+    'pending_review',
+    NULL,           -- reviewer_name
+    NULL,     -- reviewer_credential
     NULL,
-    '[{"title":"Placeholder","publisher":"Placeholder","year":"2026","url":"https://example.org","unverified":true}]'::jsonb,
-    'b76f2565d98c0f166f98595c146e5d3e2e5783b70eca7f52bb05ac6628afba75',
-    'draft',
+    NULL
+) ON CONFLICT (slug) DO UPDATE SET
+    category = EXCLUDED.category,
+    subcategory = EXCLUDED.subcategory,
+    title = EXCLUDED.title,
+    summary = EXCLUDED.summary,
+    body = EXCLUDED.body,
+    steps = EXCLUDED.steps,
+    tags = EXCLUDED.tags,
+    contextual_trigger = EXCLUDED.contextual_trigger,
+    sources = EXCLUDED.sources,
+    content_hash = EXCLUDED.content_hash,
+    review_state = EXCLUDED.review_state,
+    reviewer_name = EXCLUDED.reviewer_name,
+    reviewer_credential = EXCLUDED.reviewer_credential,
+    last_reviewed = EXCLUDED.last_reviewed,
+    reviewed_content_hash = EXCLUDED.reviewed_content_hash;
+
+INSERT INTO safety_content (
+    slug, category, subcategory, title, summary, body,
+    steps, tags, contextual_trigger, sources, content_hash,
+    review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
+) VALUES (
+    'firstaid-smoke-inhalation',
+    'first_aid',
+    'smoke',
+    'Smoke Inhalation',
+    'Smoke can injure the airway even when the skin is not burnt. Get to fresh air and get checked.',
+    'Smoke and fumes can injure the airway even when there are no burns on the skin. This is first aid only. Anyone who has breathed smoke should be seen by a health worker, even if they seem fine.',
+    '[{"title":"Get out, call 192","body":"Leave the smoke and get into fresh air, then call 192 — toll-free on all networks. GNFS says not to attempt to put out a fire where it is emitting toxic smoke, and that if you suspect the smoke is toxic, or simply do not know, you should leave it to the professionals."},{"title":"Keep low going out","body":"NFPA says to always choose the escape route that is safest — the one with the least amount of smoke and heat — but to be prepared to escape under toxic smoke if necessary. NFPA teaches everyone to practise getting low and going under the smoke to the exit."},{"title":"Get out and stay out","body":"Once you are outside, do not go back in. This is NFPA''s core message in a fire: get out and stay out. GNFS says to close doors when exiting, to help limit the spread of smoke and fire throughout the building."},{"title":"Check for airway burns","body":"ANZCOR says to always assume inhalation injury if there are burns to the face, nasal hairs, eyebrows or eyelashes, or if there is evidence of carbon (sooty) deposits in the nose or mouth. Tell the responders straight away if you see any of these."},{"title":"Get medical help","body":"Anyone who has breathed smoke should be assessed by a health worker. WHO reports that particulate matter and other pollutants in household air pollution inflame the airways and lungs, impair immune response, and reduce the oxygen-carrying capacity of the blood."},{"title":"Do not re-enter","body":"Do not go back in for belongings, and do not send anyone else in. If someone is missing, tell the fire crew immediately — GNFS says to check that all other people are out and assembled at a safe meeting point, and to conduct a headcount."}]'::jsonb,
+    '["smoke","smoke inhalation","breathing","fumes","choking","coughing","soot","airway","generator smoke"]'::jsonb,
+    'post_call',
+    '[{"title":"Guideline 9.1.3 – First Aid for Burns","publisher":"Australian and New Zealand Committee on Resuscitation (ANZCOR)","year":"2023","url":"https://www.anzcor.org/home/first-aid/guideline-9-1-3-first-aid-for-burns"},{"title":"Household air pollution (fact sheet)","publisher":"World Health Organization","year":"2025","url":"https://www.who.int/news-room/fact-sheets/detail/household-air-pollution-and-health"},{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"Fire extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/fire-extinguishers"}]'::jsonb,
+    'ff6a9d242427c009df49642d182c2f3bd56e5cac3a4d996575224b133fb8712e',
+    'pending_review',
+    NULL,           -- reviewer_name
+    NULL,     -- reviewer_credential
+    NULL,
+    NULL
+) ON CONFLICT (slug) DO UPDATE SET
+    category = EXCLUDED.category,
+    subcategory = EXCLUDED.subcategory,
+    title = EXCLUDED.title,
+    summary = EXCLUDED.summary,
+    body = EXCLUDED.body,
+    steps = EXCLUDED.steps,
+    tags = EXCLUDED.tags,
+    contextual_trigger = EXCLUDED.contextual_trigger,
+    sources = EXCLUDED.sources,
+    content_hash = EXCLUDED.content_hash,
+    review_state = EXCLUDED.review_state,
+    reviewer_name = EXCLUDED.reviewer_name,
+    reviewer_credential = EXCLUDED.reviewer_credential,
+    last_reviewed = EXCLUDED.last_reviewed,
+    reviewed_content_hash = EXCLUDED.reviewed_content_hash;
+
+INSERT INTO safety_content (
+    slug, category, subcategory, title, summary, body,
+    steps, tags, contextual_trigger, sources, content_hash,
+    review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
+) VALUES (
+    'firstaid-evacuation',
+    'first_aid',
+    'evacuation',
+    'Getting Everyone Out',
+    'Fire gives you a minute or two. Leave, call 192 from outside, and stay out.',
+    'Getting everyone out is the first priority — before property, before putting anything out. NFPA says fire can spread rapidly, leaving you as little as one or two minutes to escape safely. These steps come from NFPA home fire escape planning and Ghana National Fire Service workplace guidance.',
+    '[{"title":"Leave immediately","body":"Get out and take everyone with you. Do not stop for belongings. NFPA says fire can spread rapidly through your home, leaving you as little as one or two minutes to escape safely once the smoke alarm sounds."},{"title":"Call 192 outside","body":"Once you are safely outside, call 192. GNFS says to call immediately and not to hang up on the emergency responder until you are told to do so. NFPA says any member of the household should be able to call from a neighbour''s home or a mobile phone once safely outside."},{"title":"Close doors behind you","body":"GNFS says to close doors when exiting, to help limit the spread of smoke and fire throughout the building. NFPA says a closed door may slow the spread of smoke, heat, and fire."},{"title":"Never use lifts","body":"GNFS says never to use elevators during an evacuation. Use the stairs."},{"title":"Meet at assembly point","body":"GNFS says to follow an agreed and constantly practised escape plan and meet at a pre-determined place — an assembly point outside your building and away from danger. NFPA says to choose an outside meeting place a safe distance in front of the building."},{"title":"Do a headcount","body":"GNFS says to conduct a headcount to ensure everyone has evacuated. If someone is missing, tell the fire crew — do not go back in to look for them yourself."},{"title":"Stay out","body":"Once out, stay out. NFPA''s message in a fire is to get out and stay out."},{"title":"Plan two ways out","body":"Before an emergency, NFPA says to walk through the building and mark two ways out of each room, including windows and doors, and to check that escape routes are clear and doors and windows open easily. NFPA says to practise the plan twice a year, and to make sure someone is assigned to assist infants, older adults, and anyone with mobility limitations."}]'::jsonb,
+    '["evacuation","escape","exit","get out","assembly point","fire drill","stairs","two ways out","headcount"]'::jsonb,
+    NULL,
+    '[{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"Fire extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/fire-extinguishers"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"}]'::jsonb,
+    '3b0ab9aae866d73f2d437ce7f8c5fe61e2044aae682609ad6906a573076a005e',
+    'pending_review',
+    NULL,           -- reviewer_name
+    NULL,     -- reviewer_credential
+    NULL,
+    NULL
+) ON CONFLICT (slug) DO UPDATE SET
+    category = EXCLUDED.category,
+    subcategory = EXCLUDED.subcategory,
+    title = EXCLUDED.title,
+    summary = EXCLUDED.summary,
+    body = EXCLUDED.body,
+    steps = EXCLUDED.steps,
+    tags = EXCLUDED.tags,
+    contextual_trigger = EXCLUDED.contextual_trigger,
+    sources = EXCLUDED.sources,
+    content_hash = EXCLUDED.content_hash,
+    review_state = EXCLUDED.review_state,
+    reviewer_name = EXCLUDED.reviewer_name,
+    reviewer_credential = EXCLUDED.reviewer_credential,
+    last_reviewed = EXCLUDED.last_reviewed,
+    reviewed_content_hash = EXCLUDED.reviewed_content_hash;
+
+INSERT INTO safety_content (
+    slug, category, subcategory, title, summary, body,
+    steps, tags, contextual_trigger, sources, content_hash,
+    review_state, reviewer_name, reviewer_credential, last_reviewed, reviewed_content_hash
+) VALUES (
+    'firstaid-extinguisher-pass',
+    'first_aid',
+    'extinguisher',
+    'Using a Fire Extinguisher (PASS)',
+    'Call 192 first, make sure everyone is out, and only then fight a small, contained fire.',
+    'An extinguisher is for a small, contained fire only — never for a fire that is growing or filling the room with smoke. GNFS says to call for help before attempting to extinguish a serious fire. Both GNFS and NFPA teach the same four actions, remembered as PASS.',
+    '[{"title":"Call 192 first","body":"GNFS says to call for help before attempting to extinguish a serious fire, and to call, or have someone else call, 192 as soon as possible. Ask the fire service to come immediately, giving your address or a landmark and a brief description of the type of fire."},{"title":"Check everyone is out","body":"GNFS says to check that all other people are out and that they are all assembled at a safe meeting point. NFPA says to use a portable extinguisher only when everyone has exited the building and the fire department has been called or is being called."},{"title":"Only small fires","body":"GNFS says only a contained fire should be fought using a fire extinguisher. NFPA says to use one when the fire is confined to a small area, such as a wastebasket, is not growing, and the room is not filled with smoke. GNFS says not to attempt to put out a fire that is emitting toxic smoke."},{"title":"Keep your exit clear","body":"GNFS recommends installing extinguishers close to an exit point, so you can keep your back to the exit when you use it and make an easy escape if the fire cannot be controlled. NFPA gives the same advice. GNFS says that if a safe retreat is threatened at all, leave at once."},{"title":"Pull the pin","body":"Break the seal and pull the safety pin from the handle. NFPA says to hold the extinguisher with the nozzle pointing away from you and release the locking mechanism."},{"title":"Aim low","body":"NFPA says to aim low and point the extinguisher at the base of the fire, not at the flames. GNFS says to aim the nozzle or hose at the base of the fire and to keep yourself low."},{"title":"Squeeze the lever","body":"NFPA says to squeeze the lever slowly and evenly. GNFS notes that letting go of the handle will stop the discharge, so keep it held down."},{"title":"Sweep side to side","body":"NFPA says to sweep the nozzle from side to side. GNFS says to sweep over the fire until the extinguisher is expended, and to stand several metres back, because extinguishers are made for use from a distance."},{"title":"Know when to go","body":"NFPA says that if the room fills with smoke, leave immediately. GNFS says a typical extinguisher holds only about 10 seconds of extinguishing power, and that if the fire does not respond after it is used up, you should move to a place of safety quickly."},{"title":"Children must not","body":"GNFS says not to allow children to attempt to use a fire extinguisher or control a fire in any respect whatsoever. NFPA believes children should not be trained how to operate portable fire extinguishers, because it runs counter to the message to get out and stay out."}]'::jsonb,
+    '["extinguisher","fire extinguisher","PASS","pull aim squeeze sweep","put out fire","small fire","cylinder"]'::jsonb,
+    NULL,
+    '[{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"Fire extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/fire-extinguishers"},{"title":"NFPA 10, Standard for Portable Fire Extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/codes-and-standards/nfpa-10-standard-development/10","unverified":true}]'::jsonb,
+    'ae56b233dd4ba11229dda8463d2d373833b309ea8936ddaaa20160f181478b41',
+    'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
     NULL,
