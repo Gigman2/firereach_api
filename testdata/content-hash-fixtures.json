@@ -1,0 +1,51 @@
+[
+  {
+    "name": "empty",
+    "input": {"slug": "", "title": "", "summary": "", "body": "", "steps": [], "sources": []},
+    "expected": "c60b1f6ce4ac96cdb68fdab9e25e13fc2a4e1711f13ae42e028921c40b9abf5e"
+  },
+  {
+    "name": "minimal",
+    "input": {"slug": "hazard-cooking", "title": "Cooking Fire Safety", "summary": "",
+              "body": "Never leave cooking unattended.", "steps": [], "sources": []},
+    "expected": "ae8f08702b126f90ebaf665aa1467ab4a4098b0cd3d3ea44890959ab6970fff4"
+  },
+  {
+    "name": "whitespace-equivalent",
+    "input": {"slug": "  hazard-cooking ", "title": "Cooking\tFire   Safety", "summary": "   ",
+              "body": "Never leave\n\ncooking unattended.", "steps": [], "sources": []},
+    "expected": "ae8f08702b126f90ebaf665aa1467ab4a4098b0cd3d3ea44890959ab6970fff4"
+  },
+  {
+    "name": "unicode-decomposed",
+    "input": {"slug": "firstaid-burns", "title": "Brûlures", "summary": "", "body": "",
+              "steps": [], "sources": []},
+    "expected": "8e644e6b41e93e500c0e4651fa0ec3cbf63dd1ccead3fa69ac74ee265dde50de"
+  },
+  {
+    "name": "unicode-composed",
+    "input": {"slug": "firstaid-burns", "title": "Brûlures", "summary": "", "body": "",
+              "steps": [], "sources": []},
+    "expected": "8e644e6b41e93e500c0e4651fa0ec3cbf63dd1ccead3fa69ac74ee265dde50de"
+  },
+  {
+    "name": "full-item",
+    "input": {"slug": "firstaid-burns", "title": "Burns", "summary": "What to do first.",
+              "body": "Act immediately.",
+              "steps": [{"title": "Stop the burning", "body": "Move away from the heat source."},
+                        {"title": "Cool the burn", "body": "Cool running water for 20 minutes."}],
+              "sources": [{"title": "Burns", "publisher": "World Health Organization", "year": "2023",
+                           "url": "https://www.who.int/news-room/fact-sheets/detail/burns"}]},
+    "expected": "b4a11ce03a1c5b2713219fef07bac00baba264d4642f8ce2f601d532f7d148e3"
+  },
+  {
+    "name": "full-item-steps-reordered",
+    "input": {"slug": "firstaid-burns", "title": "Burns", "summary": "What to do first.",
+              "body": "Act immediately.",
+              "steps": [{"title": "Cool the burn", "body": "Cool running water for 20 minutes."},
+                        {"title": "Stop the burning", "body": "Move away from the heat source."}],
+              "sources": [{"title": "Burns", "publisher": "World Health Organization", "year": "2023",
+                           "url": "https://www.who.int/news-room/fact-sheets/detail/burns"}]},
+    "expected": "745f20aaf4e63e63ddb0bd85bdd12ba37e87cde9dd10fe14f6ae1e6deacb355a"
+  }
+]
