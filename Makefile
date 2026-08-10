@@ -36,5 +36,8 @@ tidy:
 seed:
 	docker compose exec -T db psql -v ON_ERROR_STOP=1 -U firereach -d firereach < seeds/dev_stations.sql
 
+seed-content:
+	docker compose exec -T db psql -v ON_ERROR_STOP=1 -U firereach -d firereach < seeds/safety_content.sql
+
 swagger:
 	go tool swag init -g cmd/api/main.go
