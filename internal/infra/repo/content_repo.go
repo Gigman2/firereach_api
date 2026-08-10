@@ -92,12 +92,21 @@ func scanContent(row rowScanner) (domain.SafetyContent, error) {
 }
 
 // List and GetByID both filter to what is safe for any unauthenticated
-// client to see. The public API has no auth on this endpoint, and
-// withdrawal is the one mechanism for pulling content judged unsafe — it
-// must be enforced where the data lives, not only by the app client. draft
-// rows are excluded too: they are work in progress, not yet offered for
-// review, and were never meant to be public.
-const publicReviewStates = `review_state IN ('pending_review', 'reviewed')`
+// client to see. draft rows are excluded: they are work in progress, not
+// yet offered for review, and were never meant to be public.
+//
+// withdrawn rows are deliberately included, not excluded (N2). Withdrawal is
+// a signal the client needs, not content to hide server-side — the app's
+// visibleItems()/effectiveState() already treat `withdrawn` as invisible to
+// the user, and isAcceptable already permits it over the wire. If List
+// filtered withdrawn out here, a withdrawn guide would simply be absent from
+// /v1/content, and refreshContent's bundled-floor union (safetyContent.ts)
+// would restore the bundled copy of that same slug in its place — silently
+// undoing the withdrawal on every client, the exact opposite of what
+// withdrawing a guide is supposed to do. The client must receive the
+// tombstone in order to honour it; it is the client, not this query, that
+// hides it.
+const publicReviewStates = `review_state IN ('pending_review', 'reviewed', 'withdrawn')`
 
 func (r *ContentRepo) List(ctx context.Context, category, subcategory string) ([]domain.SafetyContent, error) {
 	query := `
@@ -130,6 +139,7 @@ func (r *ContentRepo) GetByID(ctx context.Context, id string) (*domain.SafetyCon
 		SELECT ` + contentColumns + `
 		FROM safety_content
 		WHERE id = $1
+		  AND ` + publicReviewStates + `
 	`
 	c, err := scanContent(r.pool.QueryRow(ctx, query, id))
 	if err != nil {
@@ -137,14 +147,6 @@ func (r *ContentRepo) GetByID(ctx context.Context, id string) (*domain.SafetyCon
 			return nil, domain.ErrNotFound
 		}
 		return nil, fmt.Errorf("postgres get content: %w", err)
-	}
-
-	// Withdrawal is the one mechanism for pulling content judged unsafe; a
-	// direct-by-ID fetch must honour it exactly like List does, or the
-	// public endpoint returns a withdrawn item verbatim to anything that
-	// isn't this app's own client-side filter.
-	if c.Review.State == domain.ReviewStateWithdrawn {
-		return nil, domain.ErrNotFound
 	}
 
 	return &c, nil

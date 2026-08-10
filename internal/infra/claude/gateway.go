@@ -144,7 +144,15 @@ var medicationDosagePattern = regexp.MustCompile(`(?i)\b[0-9]{1,4}\s*mg\b`)
 // model to give for a pain-relief question, so a filtered response reads the
 // same as a correctly-following one rather than as a visibly different
 // fallback.
-const medicationRefusal = "I can't advise on medication, including its name. A pharmacist or clinician can help with pain relief. For the burn itself, I can help with fire safety first aid."
+//
+// This substitution discards the model's entire answer, not just the
+// medication mention — so if the question described a real emergency (a
+// burn injury, say), the scene-safety action and the advice to call for
+// help go with it. The refusal must stand on its own rather than leave the
+// user with nothing but a pharmacist referral, so it ends by pointing at the
+// same emergency number systemPrompt above already gives for every other
+// emergency case.
+const medicationRefusal = "I can't advise on medication, including its name. A pharmacist or clinician can help with pain relief. For the burn itself, I can help with fire safety first aid. If this is an emergency, call " + EmergencyPhone + " now."
 
 // containsMedication reports whether text names a forbidden medication brand
 // or generic name, or states a dosage in milligrams. Belt and braces: the

@@ -1,6 +1,9 @@
 package claude
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // Plain unit test: no build tag, no live API call. It feeds contaminated
 // strings straight through containsMedication (the deterministic filter
@@ -53,5 +56,16 @@ func TestContainsMedication_LeavesSafeTextAlone(t *testing.T) {
 func TestMedicationRefusal_ContainsNoMedicationItself(t *testing.T) {
 	if containsMedication(medicationRefusal) {
 		t.Fatalf("medicationRefusal itself trips containsMedication: %q", medicationRefusal)
+	}
+}
+
+// The refusal discards the model's entire answer, not just the medication
+// mention — so a real emergency question (a burn injury that happens to
+// name a drug) must not lose its scene-safety escalation along with the
+// drug name. The refusal must stand on its own, pointing at the same
+// emergency number every other emergency case in the system prompt uses.
+func TestMedicationRefusal_PointsToEmergencyNumber(t *testing.T) {
+	if !strings.Contains(medicationRefusal, EmergencyPhone) {
+		t.Fatalf("medicationRefusal does not mention the emergency number %q: %q", EmergencyPhone, medicationRefusal)
 	}
 }
