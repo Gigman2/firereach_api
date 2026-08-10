@@ -9,40 +9,40 @@ INSERT INTO safety_content (
     'hazard',
     'electrical',
     'Electrical Fire Safety',
-    'How to spot bad wiring, overloaded sockets, and generator risks before they start a fire.',
-    'Electrical faults start a lot of fires. NFPA reports that in 2020–2024, home fires involving an electrical failure or malfunction, or electrical equipment involved in ignition, caused an annual average of 527 deaths and 1,580 injuries in the United States. Extension boards, long runs of flex, and standby generators all add risk.
+    'Spot bad wiring, overloaded sockets, and generator danger before they start a fire.',
+    'Bad wiring and overloaded sockets start a lot of fires. Faulty electrical equipment is one of the most common causes of house and shop fires.
 
 In the house, shop, or office:
 
-- NFPA says to have all electrical work done by a qualified electrician.
-- NFPA says to plug only one heat-producing appliance — a kettle, iron, or heater — into a socket at a time.
-- NFPA says major appliances such as fridges, washers, and stoves should be plugged directly into a wall socket, and that extension cords and plug strips should not be used for them.
-- NFPA says extension cords are intended for temporary use, and to check that cords are not running across doorways or under carpets.
-- GNFS says to check your electrical cords, and to replace a cord that is damaged in any way.
-- GNFS says not to lay cords where they can be stepped on, as this contributes to deterioration of the protective outside coating.
-- GNFS says not to overload your circuits.
-- GNFS says to turn off electrical appliances at the end of each day, or when they are not in use.
-- GNFS says to keep heat-producing equipment away from anything that might burn.
+- Let a qualified electrician do all electrical work.
+- Plug only one heat-producing appliance into a socket at a time — a kettle, an iron, a heater.
+- Plug big appliances like fridges, washers, and stoves straight into a wall socket. Do not run them off an extension board or plug strip.
+- Extension cords are for temporary use only. Never run a cord across a doorway or under a carpet or mat.
+- Check your cords. Replace any cord that is damaged in any way.
+- Do not lay cords where people step on them. It wears away the outer covering.
+- Do not overload your circuits.
+- Switch appliances off at the end of the day, and whenever you are not using them.
+- Keep anything that gets hot away from things that burn.
 
-NFPA says to call a qualified electrician or your landlord if you have any of these:
+Call an electrician or your landlord if you notice any of these:
 
-- Frequent problems with blowing fuses or tripping circuit breakers.
-- A tingling feeling when you touch an electrical appliance.
-- Discoloured or warm wall outlets.
-- A burning or rubbery smell coming from an appliance.
-- Flickering or dimming lights.
-- Sparks from an outlet.
+- Fuses blowing or breakers tripping often.
+- A tingling feeling when you touch an appliance.
+- Wall sockets that are warm or discoloured.
+- A burning or rubbery smell from an appliance.
+- Lights that flicker or dim.
+- Sparks from a socket.
 
-Generators and carbon monoxide. WHO''s indoor air quality guidelines describe carbon monoxide as "a colourless, non-irritant, odourless and tasteless toxic gas", produced by "the incomplete combustion of carbonaceous fuels such as wood, petrol, coal, natural gas and kerosene". WHO says it binds to haemoglobin in place of oxygen, so that less haemoglobin is left to carry oxygen, and the result is arterial hypoxaemia. You cannot see it or smell it, and a generator that is barely smoking is still producing it.
+A generator gives off carbon monoxide. You cannot see it, smell it, or taste it, and it builds up in a closed space until it kills. A generator that is barely smoking is still producing it.
 
-**FireReach advises running a generator in the open air, never in a closed room or a shut-in corner of a compound.**
+Run a generator in the open air. Never in a room, and never in a shut-in corner of a compound.
 
-If a fire starts, get everyone out and call 192. GNFS says to call for help before attempting to deal with a serious fire yourself.',
+If a fire starts, get everyone out and call 192. Call for help before you try to deal with a serious fire yourself.',
     '[]'::jsonb,
     '["electrical","wiring","socket","extension board","generator","power","shock","short circuit","light off","carbon monoxide"]'::jsonb,
     NULL,
     '[{"title":"Electrical Home Fire Safety","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/electrical-safety-in-the-home"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"Carbon monoxide, in WHO Guidelines for Indoor Air Quality: Selected Pollutants","publisher":"World Health Organization","year":"2010","url":"https://www.ncbi.nlm.nih.gov/books/NBK138710/"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"}]'::jsonb,
-    '34148d5690da9aaa73f5129fe85f741558740994d9047fd0c1cc59085bfdba61',
+    'a3ee8b1644bd1c3d4d9c4ed9fdfb4cd145cee4bc57921599919e43216503f6f2',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -74,37 +74,37 @@ INSERT INTO safety_content (
     'hazard',
     'cooking',
     'Cooking Fire Safety',
-    'Staying safe with charcoal, firewood, and hot oil — and what to do when a pan catches fire.',
-    'NFPA says cooking is a leading cause of reported home fires, home fire injuries, and home fire deaths. NFPA also reports that unattended equipment is a factor in one quarter of reported home cooking fires and half of the associated deaths. The precautions below come from NFPA, the Ghana National Fire Service, and WHO.
+    'Charcoal, firewood, and hot oil — and what to do when a pan catches fire.',
+    'Cooking causes more home fires than anything else. Most of them start when food is left unattended.
 
-While you are cooking, NFPA says:
+While you cook:
 
-- Stay in the kitchen while you are frying, grilling, boiling, or broiling food.
-- If you are simmering, baking, or roasting food, check it regularly, remain in the kitchen while food is cooking, and use a timer to remind you that you are cooking.
-- Be on alert. If you are sleepy or have consumed alcohol, do not use the stove or stovetop.
-- Keep anything that can catch fire — oven mitts, wooden utensils, food packaging, towels or curtains — away from your stovetop.
-- Heat the oil slowly to the temperature you need, and add food gently to the pan so the oil does not splatter.
-- If you see wisps of smoke or the oil smells, immediately turn off the burner and carefully remove the pan. Smoke is a danger sign that the oil is too hot.
-- Always cook with a lid beside your pan.
+- Stay in the kitchen while you fry, grill, boil, or roast.
+- If you are simmering or baking, check the food often and set a timer to remind you it is on.
+- Do not cook if you are sleepy or have been drinking.
+- Keep oven mitts, wooden spoons, food packaging, towels, and curtains away from the flame or hotplate.
+- Heat oil slowly. Add food gently so the oil does not splash.
+- If you see wisps of smoke, or the oil smells, turn the heat off at once and carefully move the pan off. Smoke means the oil is too hot.
+- Keep a lid beside the pan whenever you fry.
 
 If a pan catches fire:
 
-- NFPA and GNFS both say to turn off the heat and slide the lid over the pan to smother the flames.
-- NFPA says to leave the pan covered until it is completely cooled, and not to remove the cover because the fire could start again.
-- NFPA says never to throw water on the fire.
-- For an oven fire, NFPA says to turn off the heat and keep the door closed.
-- NFPA says that if the fire does not go out, or you do not feel comfortable sliding a lid over the pan, get everyone out and close the door behind you. Then call 192 from outside.
+- Turn off the heat and slide the lid over the pan to smother the flames.
+- Leave the lid on until the pan is completely cool. Taking it off too soon can restart the fire.
+- Never throw water on burning oil.
+- For an oven fire, turn off the heat and keep the door shut.
+- If the fire does not go out, or you are not confident, get everyone out, close the door behind you, and call 192 from outside.
 
-Charcoal, firewood, and kerosene. WHO''s indoor air quality guidelines describe carbon monoxide as "a colourless, non-irritant, odourless and tasteless toxic gas", produced by "the incomplete combustion of carbonaceous fuels such as wood, petrol, coal, natural gas and kerosene". It cannot be seen or smelled. Charcoal that has stopped flaming and is only glowing is still burning, and still producing it.
+Charcoal, firewood, and kerosene give off carbon monoxide as they burn. You cannot see it, smell it, or taste it, and it can kill you in your sleep. Charcoal that has stopped flaming and is only glowing is still burning, and still giving it off.
 
-**FireReach advises never bringing a coalpot or brazier into a closed room, including to keep warm, and cooking where there is good airflow.**
+Never bring a coalpot or brazier into a closed room, not even to keep warm. Cook where the air moves freely.
 
-**Not covered here:** this guide does not cover LPG gas cylinders — leaks, regulators, hoses, or storage.',
+This guide does not cover gas cylinders — leaks, regulators, hoses, or storage.',
     '[]'::jsonb,
     '["cooking","kitchen","charcoal","coalpot","brazier","stove","hot oil","frying","kerosene","carbon monoxide"]'::jsonb,
     NULL,
     '[{"title":"Safety with cooking equipment","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/cooking"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"Carbon monoxide, in WHO Guidelines for Indoor Air Quality: Selected Pollutants","publisher":"World Health Organization","year":"2010","url":"https://www.ncbi.nlm.nih.gov/books/NBK138710/"}]'::jsonb,
-    '62519f1cb5628df4b39b1ef6ba5b69d4730019f49eaa83eb19a23c08ec1ac2be',
+    'ea16f4d6ef3ad47c4bfdb18b7c39c8cbb85f745425d2686432254eed8abe22dd',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -136,36 +136,38 @@ INSERT INTO safety_content (
     'hazard',
     'home',
     'Home Fire Safety',
-    'Cut the risk at home, and make sure everyone can get out in the two minutes a fire gives you.',
-    'NFPA says fire can spread rapidly through your home, leaving you as little as one or two minutes to escape safely once the smoke alarm sounds. **Most homes here have no smoke alarm.** Without one there is no early warning at all, so the clock starts only when somebody happens to notice — which means less time, not more.
+    'Cut the risk at home, and make sure everyone can get out in the minute or two a fire gives you.',
+    'Fire spreads fast. Once it takes hold you may have only a minute or two to get out. Most homes here have no smoke alarm, so no one gets an early warning — the clock starts only when somebody notices.
 
-Smoke alarms. NFPA says to install smoke alarms in every sleeping room, outside each sleeping area, and on every level of the home. Where alarms are fitted, NFPA says that when one sounds they should all sound. If you have no alarm, treat every other precaution below as more important, not less.
+Smoke alarms:
+
+- Fit an alarm in every bedroom, outside each sleeping area, and on every floor.
+- If you have no alarm, everything else on this page matters more, not less.
 
 Reduce the risk:
 
-- GNFS says to keep your space free of waste paper, trash, and other items that can easily catch fire.
-- NFPA says to have all electrical work done by a qualified electrician.
-- NFPA says only one heat-producing appliance should be plugged into a receptacle outlet at a time.
-- GNFS says to turn off electrical appliances when they are not in use.
-- NFPA''s rule for the stovetop is to keep anything that can catch fire away from it. FireReach applies the same rule to any open flame — kerosene lamps, candles, and coalpots near curtains, mats, or mattresses.
+- Keep your space clear of waste paper, rubbish, and anything else that catches easily.
+- Let a qualified electrician do all electrical work.
+- Plug only one heat-producing appliance into a socket at a time.
+- Switch appliances off when you are not using them.
+- Keep anything that burns well away from any open flame. Curtains, mats, and mattresses do not belong near a kerosene lamp, a candle, or a coalpot.
 
-Be ready to get out. NFPA says:
+Be ready to get out:
 
-- Walk through your home and inspect all possible exits and escape routes, marking two ways out of each room, including windows and doors.
-- When you walk through your plan, check to make sure the escape routes are clear and doors and windows can be opened easily.
-- Choose an outside meeting place a safe distance in front of your home where everyone can meet after they have escaped.
-- If windows or doors in your home have security bars, make sure that the bars have emergency release devices inside so that they can be opened immediately in an emergency. FireReach applies the same principle to a shared compound gate: it must open immediately, not be padlocked shut.
-- Have everyone memorize the emergency phone number of the fire department, so any member of the household can call from a neighbour''s home or a mobile phone once safely outside. In Ghana that number is 192, toll-free on all networks.
-- If there are infants, older adults, or family members with mobility limitations, make sure that someone is assigned to assist them in the fire drill and in the event of an emergency. Assign a backup person too.
-- Practise your home fire escape plan twice a year.
-- A closed door may slow the spread of smoke, heat and fire. Close doors on your way out.
-
-Items that block doors and windows could keep you from escaping, so NFPA says to unblock your exits.',
+- Walk through your home and find two ways out of every room. Count windows, not just doors.
+- Check that both ways out are clear, and that the doors and windows open easily.
+- Agree on a meeting place outside, a safe distance in front of the house, where everyone gathers.
+- Burglar bars need a release catch on the inside that opens immediately. A compound gate must open immediately too — never padlocked shut at night.
+- Make sure everyone knows to call 192, so anyone can call from a neighbour''s phone once they are outside.
+- Decide now who helps the babies, the elderly, and anyone who cannot move quickly. Name a second person too, in case the first one is out.
+- Practise the plan twice a year.
+- Close doors behind you as you leave. A closed door slows the fire and buys you time.
+- Never block a door or window with furniture, stock, or goods.',
     '[]'::jsonb,
     '["home","house","compound","candle","lantern","kerosene lamp","escape plan","smoke alarm","fire at home","two ways out"]'::jsonb,
     NULL,
     '[{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"},{"title":"Electrical Home Fire Safety","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/electrical-safety-in-the-home"},{"title":"Safety with cooking equipment","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/cooking"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"}]'::jsonb,
-    '58b549597f452ba793c263dc239a7c9536aa7ce60218dd2b9a76fdadaf6520cc',
+    '84dc3753a44653acd27108520ed007d6ab42d1330b635e3a5bd64dc081e29a72',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -197,35 +199,36 @@ INSERT INTO safety_content (
     'hazard',
     'workplace',
     'Workplace Fire Safety',
-    'The Ghana National Fire Service''s own fire prevention and evacuation guidance for businesses.',
-    'The Ghana National Fire Service says that no matter the type of business you conduct at your workplace, fire safety should always be a major concern as it remains very important for the sustenance of your business. Almost everything below is GNFS''s own workplace guidance, quoted closely. NFPA advice on extinguishers is added where it agrees.
+    'Fire prevention and evacuation for shops, offices, workshops, and market stalls.',
+    'Fire safety keeps your staff alive and your business trading. Whatever work you do, treat it as a priority.
 
-Fire prevention, from GNFS:
+Prevent it:
 
-- Keep your work area free of waste paper, trash and other items that can easily catch fire.
-- Check on your electrical cords. If a cord is damaged in any way, replace it.
-- Try not to lay cords in places where they can be stepped on, as this will contribute to deterioration of the protective outside coating.
+- Keep work areas clear of waste paper, rubbish, and anything else that catches easily.
+- Check your cords. Replace any cord that is damaged in any way.
+- Do not run cords where people walk on them. It wears the covering away.
 - Do not overload your circuits.
-- Turn off electrical appliances at the end of each day or when not in use.
-- Keep heat producing equipment away from anything that might burn. This includes copiers, water dispensers, computers.
-- Contact your local Fire Station for a suitable fire extinguisher and let them help teach and install it at the appropriate place in the work premise.
+- Switch appliances off at the end of each day, and whenever they are not in use.
+- Keep anything that gets hot away from things that burn — copiers, water dispensers, computers.
+- Ask your local fire station for the right extinguisher. They will help you put it in the right place and show your staff how to use it.
 
-In the event of a fire, GNFS says:
+If fire breaks out:
 
-- Call 192 immediately and do not hang up on the emergency responder until you are told to do so. GNFS publishes 0302 772 446, 0299 340 383, 192 and 112 together. GNFS also says to save your local Fire Station number on your phone.
-- Close doors when exiting to help limit the spread of smoke and fire throughout the building.
-- Never use elevators during an evacuation.
-- Follow an agreed and constantly practiced escape plan and meet at a pre-determined place, an assembly point outside of your building and away from danger.
-- Conduct a headcount to ensure all of your staff has evacuated.
+- Call 192 straight away, and do not hang up until the responder tells you to. You can also reach the fire service on 0302 772 446, 0299 340 383, or 112.
+- Save your local fire station''s number in your phone now.
+- Close doors as you leave, to hold back the smoke and fire.
+- Never use the lift.
+- Follow the escape plan you have practised. Gather at your assembly point, outside the building and away from danger.
+- Count everyone, so you know all your staff are out.
 
-If anyone uses an extinguisher, NFPA says to do so only when the fire is confined to a small area and is not growing, everyone has exited the building, the fire department has been called or is being called, and the room is not filled with smoke.
+Only pick up an extinguisher if the fire is small and not spreading, everyone else is out, 192 has been called, and the room is not full of smoke.
 
-GNFS says the best way to ensure the safety of your staff is through fire prevention and preparation. GNFS asks employers to talk with staff about fire safety in the workplace, or contact their local Fire Station for fire safety education.',
+Preparation protects your staff far better than anything you can do once a fire has started. Talk to your team about it, or ask your local fire station to come and teach them.',
     '[]'::jsonb,
     '["workplace","office","shop","market","business","staff","assembly point","fire drill","fire certificate"]'::jsonb,
     NULL,
     '[{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"Fire extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/fire-extinguishers"}]'::jsonb,
-    'b571c8426fbc230dbbd6c803aa1ed950eb5f04955405df773faf286a3b9bb836',
+    'f27d22fa01032eddd68a27dca1f87e6ab1e336c86c2121e26b0aa1dd0dcdb649',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -257,33 +260,32 @@ INSERT INTO safety_content (
     'hazard',
     'seasonal',
     'Dry Season and Bush Fire Safety',
-    'Starting a bushfire is a criminal offence in Ghana, and so is failing to report one. What the law requires.',
-    'In the dry harmattan months the air is dry and the wind is strong, and grass, farm waste and bush catch easily. A fire that starts in the bush can reach homes, farms, fuel stores and market sheds quickly.
+    'Starting a bushfire is a criminal offence in Ghana, and so is failing to report one.',
+    'In the dry harmattan months the air is dry and the wind is strong. Grass, farm waste, and bush catch quickly and burn fast. A fire that starts out in the bush can reach homes, farms, fuel stores, and market sheds within minutes.
 
-The law. Ghana''s Control and Prevention of Bushfires Act, 1990 (P.N.D.C.L. 229), made on 1 March 1990, says:
+What the law says:
 
-- **Section 1, Prohibition of Bushfires:** "Except as otherwise provided under this Act, it is unlawful for any person to start a bushfire for any purpose."
-- **Section 2, Meaning of Starting a Bushfire:** "For the purposes of this Act, a person starts a bushfire if an action of that person results in the uncontrolled burning of any farm, forest or grassland." You do not have to intend the spread to have committed the offence.
-- **Section 8, Control of Fire:** "A person who starts a fire permitted by this Act shall control the spread of the fire." A permitted burn is still yours to control. Do not walk away from one.
-- **Section 6(1)(b):** each District''s Bushfire Control Sub-committee must "specify the period or periods in the year, and thereafter yearly, within which the burning of farm slash, grass, herbage and dead wood shall be prohibited." Burning seasons are set district by district, so ask your District Assembly what applies where you are before you burn anything.
-- **Section 12, Duty to Report Bushfire:** it is an offence to become aware of a bushfire and, without good cause, fail to report it — to a fire volunteer squad member, a member of the bushfire control Sub-committee, a police officer, or the traditional authority. Reporting a bush fire is a legal duty here, not a favour.
-- **Section 11, Offences:** contravening the Act carries a fine, or imprisonment or community labour not exceeding twelve months, or both.
-
-**Where this text came from:** the section wording above was read on a third-party legal portal, not on a government website, because the Parliament of Ghana repository does not respond to automated requests. Check with your District Assembly before you rely on it for anything that matters.
+- Starting a bushfire is a criminal offence in Ghana.
+- It counts as starting one if what you did ends in a farm, forest, or grassland burning out of control. You do not have to have meant it to spread.
+- If you light a fire you are allowed to light, controlling it is your responsibility. Never walk away from it.
+- Every district sets its own periods when burning farm slash, grass, and dead wood is banned. Ask your District Assembly what applies where you are before you burn anything.
+- If you know about a bushfire, you must report it. Failing to report one is an offence in itself.
+- Report it to a fire volunteer, someone on your district''s bushfire committee, a police officer, or your traditional authority.
+- Breaking this law can mean a fine, or imprisonment or community labour of up to twelve months, or both.
 
 If a bush or grass fire starts near you:
 
-- Call 192 straight away. GNFS says to call for help before attempting to extinguish a serious fire.
-- GNFS says not to attempt to put out a fire where it is emitting toxic smoke, and that if you suspect or simply do not know if the smoke is toxic, leave it to the professionals.
-- GNFS says to check that all other people are out and that they are all assembled at a safe meeting point.
-- NFPA says to choose an outside meeting place a safe distance in front of the building.
+- Call 192 straight away. Call for help before you try to put out a serious fire.
+- Do not try to put out a fire that is giving off toxic smoke. If you think the smoke is toxic, or you simply do not know, leave it to the professionals.
+- Check that everyone is out and gathered at a safe meeting point.
+- Keep that meeting point outside, a safe distance in front of the building.
 
-**Not covered here:** firebreaks and cleared strips around buildings, whether to burn on windy harmattan days, what time of day is safer, and keeping water or sand to hand.',
+This guide does not cover firebreaks, whether to burn on windy days, what time of day is safer, or keeping water or sand to hand.',
     '[]'::jsonb,
     '["harmattan","dry season","bush fire","bushfire","grass fire","farm","burning","wind","dry grass","bushfire law"]'::jsonb,
     NULL,
     '[{"title":"Control and Prevention of Bushfires Act, 1990 (P.N.D.C.L. 229) — sections 1, 2, 6, 8, 11 and 12","publisher":"Republic of Ghana (text read via GhanaLegal)","year":"1990","url":"https://ghanalegal.com/laws_subdomain/acts/id/506/control-and-prevention-of-bushfires-act/","unverified":true},{"title":"Control and Prevention of Bushfires Act, 1990 (P.N.D.C.L. 229) — FAOLEX record","publisher":"Food and Agriculture Organization of the United Nations (ECOLEX/FAOLEX)","year":"1990","url":"https://www.ecolex.org/details/legislation/control-and-prevention-of-bushfires-act-1990-pndcl-229-lex-faoc040958/"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"}]'::jsonb,
-    'e905fe38bbd8f5fd8dd1360e5d3768baa9c07e0103b77778e38e9e6cd2841545',
+    '0e77f9dfcfb8950b8dc39ac7eca04ac6af512a94591ba172814b40bf7237b494',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -315,13 +317,13 @@ INSERT INTO safety_content (
     'first_aid',
     'burns',
     'Burns',
-    'Cool the burn, keep the person warm, get medical help. From WHO, ANZCOR, and the European Resuscitation Council.',
-    'This is first aid only, for while you wait for help. Work through the steps in order — the first three keep you and the person safe, and only then does treatment start.',
-    '[{"title":"Get safe, call 192","body":"ANZCOR says to ensure safety for rescuers, bystanders and the person, and not to enter a burning or toxic atmosphere. Call 192 — Ghana National Fire Service, toll-free on all networks. ANZCOR says to send for an ambulance if there is a significant burn, or any doubt whether it is one."},{"title":"If clothes alight","body":"If the person''s clothing is on fire, do not move them away — put the fire out. ANZCOR says to stop the burning process by \"Stop, Drop, Cover and Roll\", to smother any flames with a blanket, and to douse with water if safe to do so. Then move away from the burn source to a safe environment as soon as possible."},{"title":"Electric shock first","body":"If electricity is involved, do not touch the person until the power is off. ANZCOR says the priority is to \"Isolate/turn off the power supply without touching the person, if safe to do so.\" For fallen power lines, ANZCOR says to notify emergency services immediately and to \"keep at least 10m from the person or wires\", because everything will conduct electricity if the voltage is high enough. ANZCOR adds that authorities differ on the safe distance and that 10 m is the maximum recommended — so 10 m is the furthest any authority asks for, not a figure to be trimmed down. ANZCOR says not to attempt to remove wires or other materials with any object, including wooden ones, which still conduct high voltages, until the power has been turned off by authorised personnel."},{"title":"Stop the burning","body":"ANZCOR says to remove wet, non-adherent clothing, as clothing soaked with hot liquids retains heat. ANZCOR says: DO NOT peel off adherent clothing or burnt substances. If cloth is stuck to the skin, leave it and cool over the top of it. ANZCOR also says that if possible you should remove all rings, watches, jewellery or other constricting items from the affected area, without causing further tissue damage — do this early, before swelling starts."},{"title":"Cool 20 minutes","body":"ANZCOR recommends cooling burns as soon as practicable with cool running water, and says to cool for at least 20 minutes. WHO says to use cool running water to reduce the temperature of the burn. ANZCOR says to use any clean cool liquid if water is not available. The European Resuscitation Council says the same: commence cooling in cool or cold — not freezing — water, and continue for at least 20 minutes."},{"title":"Keep them warm","body":"Do this at the same time as the cooling, not after it. ANZCOR gives this instruction in the same list as the 20 minutes, and it is what makes the 20 minutes safe: \"Cover unburnt areas and keep the person warm to reduce the risk of hypothermia particularly small children who may develop hypothermia quickly.\" Cool the burn; do not chill the person."},{"title":"If cooling was delayed","body":"Do not read this as permission to take your time — sooner is better, always. But if you could not start cooling straight away, it is still worth doing. ANZCOR says cooling is effective up to 3 hours after injury, and should be commenced as soon as possible, the sooner the better."},{"title":"Children, large burns","body":"Take extra care with an infant, a small child, or a burn covering a large area — but do not skip the cooling. The European Resuscitation Council says care must be taken when cooling large thermal burns or burns in infants and small children so as not to induce hypothermia. WHO separately says to avoid prolonged cooling with water because it will lead to hypothermia; WHO gives no duration at all, so \"prolonged\" is not defined against the 20 minutes. ANZCOR''s own package is what this guide follows: cool the burn for the full time, cover every unburnt part of the body, and keep the person warm throughout. WHO does not state that pairing and gives no duration, so this is ANZCOR''s position, not a consensus of all three."},{"title":"Cover the person","body":"Wrap the person, not the wound. WHO says to wrap the patient in a clean cloth or sheet and transport to the nearest appropriate facility for medical care, and separately says not to apply any material directly to the wound as it might become infected. ANZCOR says to cover the burnt area with a loose non-stick dressing, preferably clean material such as plastic cling film, placed over the burn but not wrapped around a limb, and not used on the face."},{"title":"Never do these","body":"WHO says not to apply ice because it deepens the injury, and ANZCOR says not to use ice or ice water as further tissue damage may result. ANZCOR says: DO NOT break blisters, and DO NOT apply lotions, ointments, creams or powders. WHO says not to apply paste, oil or raw cotton to the burn."},{"title":"Chemical burns","body":"ANZCOR says the aim of first aid for chemical burns is not to cool the burn but to dilute the chemical. Avoid contact with the chemical yourself. Remove the chemical and any contaminated clothing and jewellery as soon as practical, and brush powdered chemicals off the skin before adding water. Then, without spreading the chemical to unaffected areas, immediately flush the area directly with running water for at least 20 minutes, up to one hour, until the stinging stops. ANZCOR says DO NOT try to neutralise an acid or alkali with another chemical, because this generates heat and may cause more damage."},{"title":"Chemical in the eye","body":"ANZCOR says to open and flush the affected eye thoroughly with water for as long as tolerated, and refer the person for urgent medical attention. If only one eye is affected, position the head so that the affected eye is down, to avoid spreading the chemical to the unaffected eye. ANZCOR says flushing of the eye is more important than immediate transfer for medical care. ANZCOR then directs the caller to a poisons hotline, but the numbers it lists are for Australia and New Zealand only and do not work here — in Ghana, call 192."},{"title":"When it is serious","body":"ANZCOR treats these as a significant burn needing medical care: a burn greater than 10% of total body surface area, which in an adult is about the size of the arm or half the leg; burns to the face, hands, feet, genitalia, perineum or major joints; full-thickness burns greater than 5%; and all electrical burns, all chemical burns, and any burn with an associated inhalation injury."}]'::jsonb,
+    'Cool the burn, keep the person warm, and get medical help.',
+    'This is first aid only, for while you wait for help. Work through the steps in order. The first three keep you and the injured person safe — treatment starts after that.',
+    '[{"title":"Get safe, call 192","body":"Make sure you, the injured person, and anyone nearby are safe before you touch anything. Do not go into a burning room or into smoke. Call 192. If the burn is serious, or you are not sure how bad it is, get an ambulance on the way."},{"title":"If clothes alight","body":"If the person''s clothes are on fire, do not move them away — put the fire out. Get them to stop, drop to the ground, cover their face, and roll. Smother the flames with a blanket, or douse them with water if it is safe. Then move them away from the fire."},{"title":"Electric shock first","body":"If electricity is involved, do not touch the person until the power is off. Switch it off at the mains or the breaker first, without touching them. If a power line has come down, call for help immediately and keep everyone at least 10 metres back from the person and the wires. Never try to move a wire with anything — not even a wooden stick or a broom, because wood still carries high voltage. Wait until someone authorised has turned the power off."},{"title":"Stop the burning","body":"Take off wet clothing near the burn, because cloth soaked in hot liquid holds the heat against the skin. If cloth is stuck to the skin, leave it there and cool over the top of it. Never peel it off. Take off rings, watches, and bangles near the burn now, before the swelling starts."},{"title":"Cool the burn","body":"Hold the burn under cool running water for at least 20 minutes. Use cool or cold water, never iced water. If you have no running water, use any clean cool liquid."},{"title":"Keep them warm","body":"Do this while you are cooling, not afterwards. Cover every part of the body that is not burnt, and keep the person warm. This matters most with a small child, who can get dangerously cold very quickly. Cool the burn — do not let the whole person get cold."},{"title":"If you were delayed","body":"Sooner is always better. But if you could not start cooling straight away, it is still worth doing. Cooling helps for up to three hours after the burn."},{"title":"Cover the person","body":"Wrap the person, not the wound. Put a clean cloth or sheet around them and get them to the nearest health facility. Put nothing on the burn itself. If you do cover the burn, lay a loose non-stick dressing or clean cling film over it — never wrapped around an arm or leg, and never on the face."},{"title":"Never do these","body":"Never put ice or iced water on a burn; it makes the injury deeper. Never break the blisters. Never rub on oil, butter, shea butter, toothpaste, ash, ointment, cream, powder, or paste of any kind. Never put raw cotton wool on it."},{"title":"Chemical burns","body":"With a chemical burn the aim is to wash the chemical off, not to cool the skin. Keep the chemical off yourself. Take off any contaminated clothing and jewellery. If the chemical is a dry powder, brush it off the skin first, before you add any water. Then flush the area with running water for at least 20 minutes, and up to an hour, until the stinging stops — taking care not to wash it onto skin that is not affected. Never try to cancel out an acid with an alkali, or the other way round; that makes heat and more damage."},{"title":"Chemical in the eye","body":"Hold the eye open and flush it with water for as long as the person can bear. Getting water into the eye matters more than rushing them away — flush first, then go. If only one eye is affected, tilt the head so the injured eye is lower, so nothing runs into the good one. Then get urgent medical help, and call 192."},{"title":"When it is serious","body":"Get medical help urgently for a burn bigger than the person''s whole arm or half a leg, or any burn to the face, hands, feet, groin, or across a joint. The same goes for a deep burn, any electrical burn, any chemical burn, and any burn where the person has also breathed smoke."}]'::jsonb,
     '["burn","burns","scald","hot water","hot oil","fire burn","blister","cooling","skin","stop drop roll","electric shock","chemical burn"]'::jsonb,
     'post_call',
     '[{"title":"Burns (fact sheet)","publisher":"World Health Organization","year":"2023","url":"https://www.who.int/news-room/fact-sheets/detail/burns"},{"title":"Guideline 9.1.3 – First Aid for Burns (approved March 2023)","publisher":"Australian and New Zealand Committee on Resuscitation (ANZCOR)","year":"2023","url":"https://www.anzcor.org/home/first-aid/guideline-9-1-3-first-aid-for-burns"},{"title":"European Resuscitation Council Guidelines 2021: First aid (Zideman DA et al., Resuscitation 161:270–290)","publisher":"European Resuscitation Council","year":"2021","url":"https://pubmed.ncbi.nlm.nih.gov/33773828/"},{"title":"Duration of Cooling With Water for Thermal Burns as a First Aid Intervention (FA 770): Systematic Review","publisher":"International Liaison Committee on Resuscitation (ILCOR)","year":"","url":"https://costr.ilcor.org/document/duration-of-cooling-with-water-for-thermal-burns-as-a-first-aid-intervention-fa-770-systematic-review"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"}]'::jsonb,
-    'cb64629ce154cf22b081b665ebe3c1bb253ed3e6c0dbef920498e563c1eba845',
+    'c92bc731c4c0117c3b0d620494868ffc5b1b6b0c74e8c1bd7a6e356e41499692',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -353,13 +355,13 @@ INSERT INTO safety_content (
     'first_aid',
     'smoke',
     'Smoke Inhalation',
-    'Smoke can injure the airway even when the skin is not burnt, and the damage can be delayed.',
-    'Smoke and fumes can injure the airway even when there are no burns on the skin. This is first aid only. If the person is unresponsive or not breathing normally, go straight to step 4.',
-    '[{"title":"Get out, call 192","body":"Leave the smoke and get into fresh air, then call 192 — toll-free on all networks. ANZCOR says to remove the person to fresh air if safe to do so, and to send for an ambulance. GNFS says not to attempt to put out a fire where it is emitting toxic smoke, and that if you suspect or simply do not know if the smoke is toxic, leave it to the professionals."},{"title":"Keep low going out","body":"NFPA says to always choose the escape route that is safest — the one with the least amount of smoke and heat — but be prepared to escape under toxic smoke if necessary. NFPA says everyone should practise getting low and going under the smoke to the exit."},{"title":"Stay out","body":"NFPA says: once you''re out, stay out, and under no circumstances should you ever go back into a burning building. NFPA says that if someone is missing, inform the fire department dispatcher when you call, because firefighters have the skills and equipment to perform rescues. GNFS says to close doors when exiting, to help limit the spread of smoke and fire."},{"title":"If not breathing","body":"ANZCOR says to maintain an open airway and assess whether the person is breathing normally, and if they are not breathing normally, to follow resuscitation guidance. FireReach does not teach resuscitation in this guide. Stay on the line with 192 and do exactly what the responder tells you — they can talk you through it."},{"title":"Check for airway burns","body":"ANZCOR says to always assume inhalation injury if there are burns to the face, nasal hairs, eyebrows or eyelashes, or if there is evidence of carbon (sooty) deposits in the nose or mouth. ANZCOR says coughing of black particles in sputum can indicate a risk of inhalation burn, and that a hoarse voice or breathing difficulties may indicate damage to the airway. Tell the responders straight away if you see any of these."},{"title":"Do not assume stable","body":"This is the reason to get checked even when someone looks fine. ANZCOR says: \"Do not assume the person burnt is stable following an inhalation injury simply because the person is breathing, talking and able to get up. Some gases produce delayed lung damage (inflammation) which may develop up to 24 hours later.\" ANZCOR says an inhalation burn should be suspected whenever someone has been trapped in an enclosed space for some time with hot or toxic gas, steam or fumes, and that injury may result from irritant gases even if they are not hot."},{"title":"Carbon monoxide","body":"Smoke from a fire, a generator, or smouldering charcoal contains carbon monoxide. WHO describes it as \"a colourless, non-irritant, odourless and tasteless toxic gas\" produced by incomplete combustion of fuels such as wood, petrol, coal, natural gas and kerosene. WHO says it binds to haemoglobin in place of oxygen, leaving progressively less haemoglobin available to carry oxygen. You cannot see it or smell it, so tell the health worker how long the person was in the smoke and what was burning."}]'::jsonb,
+    'Smoke can injure the airway even when the skin is not burnt, and the damage can come later.',
+    'Smoke and fumes can injure the airway even when there are no burns on the skin. This is first aid only. If the person is not responding, or is not breathing normally, go straight to step 4.',
+    '[{"title":"Get out, call 192","body":"Get out of the smoke and into fresh air, then call 192. Move the injured person into fresh air too, if it is safe for you to do it. Do not try to put out a fire that is giving off toxic smoke — if you think it is toxic, or you do not know, leave it to the professionals."},{"title":"Keep low","body":"Take the way out with the least smoke and heat. If you have to pass through smoke, get down low and go underneath it. The cleaner air is near the floor."},{"title":"Stay out","body":"Once you are out, stay out. Never go back into a burning building for any reason. If someone is missing, tell the firefighters when you call — they have the training and the equipment to go in. Close doors behind you as you leave, to hold the smoke and fire back."},{"title":"If not breathing","body":"Tilt the head back gently to open the airway, and check whether the person is breathing normally. If they are not, they need resuscitation immediately. This guide does not teach it — stay on the line with 192 and do exactly what the responder tells you. They can talk you through it."},{"title":"Check for airway burns","body":"Look for burns on the face, or singed nasal hairs, eyebrows, or eyelashes. Look for soot in the nose or mouth. Listen for a hoarse voice or difficult breathing, and watch for coughing up black specks. Tell the responders straight away if you see any of these."},{"title":"Do not assume safe","body":"Someone who is breathing, talking, and walking around can still be badly injured inside. Some gases damage the lungs slowly, and the swelling can come on up to 24 hours later. Anyone who has been shut in with smoke, hot gas, steam, or fumes needs to be checked — even fumes that were never hot can burn the airway."},{"title":"Carbon monoxide","body":"Smoke from a fire, a generator, or smouldering charcoal carries carbon monoxide. You cannot see it, smell it, or taste it. It takes the place of oxygen in the blood, so the body is starved of oxygen with no warning at all. Tell the health worker how long the person was in the smoke, and what was burning."}]'::jsonb,
     '["smoke","smoke inhalation","breathing","fumes","choking","coughing","soot","airway","generator smoke","carbon monoxide","unconscious"]'::jsonb,
     'post_call',
     '[{"title":"Guideline 9.1.3 – First Aid for Burns (approved March 2023)","publisher":"Australian and New Zealand Committee on Resuscitation (ANZCOR)","year":"2023","url":"https://www.anzcor.org/home/first-aid/guideline-9-1-3-first-aid-for-burns"},{"title":"Carbon monoxide, in WHO Guidelines for Indoor Air Quality: Selected Pollutants","publisher":"World Health Organization","year":"2010","url":"https://www.ncbi.nlm.nih.gov/books/NBK138710/"},{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"}]'::jsonb,
-    'e9a3e4faed2972848ba5c82331020f56563dd63072897f484fcc2a421225fe42',
+    '112adf0394ba8e55ce3c52e6c6b7678212a772c1262adcfe67a2de97313d5158',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -391,13 +393,13 @@ INSERT INTO safety_content (
     'first_aid',
     'evacuation',
     'Getting Everyone Out',
-    'Fire gives you a minute or two. Leave, call 192 from outside, and stay out — and know what to do if you cannot get out.',
-    'Getting everyone out is the first priority, before property and before putting anything out. NFPA says fire can spread rapidly, leaving you as little as one or two minutes to escape safely. If your way out is blocked, do not force it — go to step 8.',
-    '[{"title":"Leave immediately","body":"Get out and take everyone with you. Do not stop for belongings. NFPA says fire can spread rapidly through your home, leaving you as little as one or two minutes to escape safely once the smoke alarm sounds — and most homes here have no alarm, so you may have less warning than that."},{"title":"Choose the safest route","body":"NFPA says to always choose the escape route that is safest — the one with the least amount of smoke and heat — but to be prepared to escape under toxic smoke if necessary, getting low and going under the smoke to your exit."},{"title":"Call 192 outside","body":"Once you are safely outside, call 192. GNFS says to call immediately and not to hang up on the emergency responder until you are told to do so. NFPA says any member of the household can call from a neighbour''s home or a mobile phone once safely outside."},{"title":"Close doors behind you","body":"GNFS says to close doors when exiting to help limit the spread of smoke and fire throughout the building. NFPA says a closed door may slow the spread of smoke, heat and fire, and that closing doors on your way out gives you more time to escape safely."},{"title":"Never use lifts","body":"GNFS says never to use elevators during an evacuation. Use the stairs."},{"title":"Meet at assembly point","body":"GNFS says to follow an agreed and constantly practiced escape plan and meet at a pre-determined place, an assembly point outside of your building and away from danger. NFPA says to choose an outside meeting place a safe distance in front of the building, so everyone can meet after they have escaped."},{"title":"Headcount, then stay out","body":"GNFS says to conduct a headcount to ensure everyone has evacuated. NFPA says: once you''re out, stay out, and under no circumstances should you ever go back into a burning building. NFPA says if someone is missing, inform the fire department dispatcher when you call — firefighters have the skills and equipment to perform rescues."},{"title":"If you cannot get out","body":"NFPA says that in some cases smoke or fire may prevent you from exiting, and gives this as \"sealing yourself in for safety\": close all doors between you and the fire; use tape or towels to seal the door cracks and cover air vents to keep smoke from coming in; if possible open your windows at the top and bottom so fresh air can get in; call the fire department to report your exact location; and wave a torch or a light-coloured cloth at the window to let them know where you are. On 192, say exactly which room and which floor you are in."},{"title":"Plan two ways out","body":"Before an emergency, NFPA says to walk through the building and mark two ways out of each room, including windows and doors, and when you walk through your plan to check that escape routes are clear and doors and windows can be opened easily. NFPA says items that block doors and windows could keep you from escaping, so unblock your exits. NFPA says to practise the plan twice a year, and to make sure someone is assigned to assist infants, older adults, or family members with mobility limitations, with a backup person too."}]'::jsonb,
+    'Fire gives you a minute or two. Get out, call 192 from outside, and stay out.',
+    'Getting everyone out comes first — before belongings, and before trying to put anything out. Once a fire takes hold you may have only a minute or two. If your way out is blocked, go to step 8.',
+    '[{"title":"Leave now","body":"Get out, and take everyone with you. Do not stop for money, papers, or phones. You may have only a minute or two, and with no smoke alarm you may have even less."},{"title":"Take the safest way","body":"Choose the way out with the least smoke and heat. If you have to pass through smoke, get low and go underneath it."},{"title":"Call 192 outside","body":"Once you are outside, call 192. Do not hang up until the responder tells you to. If you have no phone on you, use a neighbour''s."},{"title":"Close doors","body":"Close each door behind you as you go. A closed door slows the smoke and fire, and buys everyone more time."},{"title":"Never use lifts","body":"Use the stairs. Never take a lift during a fire."},{"title":"Meet at assembly point","body":"Go to the place you agreed in advance — outside the building, and well away from the danger."},{"title":"Count everyone","body":"Count heads and make sure nobody is missing. If someone is, tell the firefighters immediately. Never go back inside to look for them yourself; they have the training and equipment for it."},{"title":"If you are trapped","body":"If smoke or fire blocks your way out, shut yourself into a room away from the fire. Close every door between you and the fire. Block the gaps under the doors with towels or cloth, and cover any vents, to keep the smoke out. Open the window at the top and the bottom if you can, for fresh air. Call 192 and say exactly which room and which floor you are on. Wave a torch or a light-coloured cloth at the window so they can see where you are."},{"title":"Plan it beforehand","body":"Find two ways out of every room, counting windows as well as doors. Check they are clear and that the doors and windows open easily, and never block them with furniture or goods. Practise twice a year. Decide who helps the babies, the elderly, and anyone who cannot move fast, and name a backup in case that person is out."}]'::jsonb,
     '["evacuation","escape","exit","get out","assembly point","fire drill","stairs","two ways out","headcount","trapped","blocked exit"]'::jsonb,
     NULL,
     '[{"title":"How to make a home fire escape plan","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"},{"title":"Fire Safety Tips for the Workplace (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107114316/https://www.gnfs.gov.gh/fire-safety-tips-workplace.php"},{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"}]'::jsonb,
-    'b55ed4189593d5b9b6f639e61f3eea2e09b907952bac45fa3ae89271a7579854',
+    '8e8d50a61582dfa5ebed444f46ed9cde298847d4904149e62fe220d45cfeb5b2',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
@@ -429,13 +431,13 @@ INSERT INTO safety_content (
     'first_aid',
     'extinguisher',
     'Using a Fire Extinguisher (PASS)',
-    'Call 192 first, make sure everyone is out, check the extinguisher suits the fire, and only then fight it.',
-    'An extinguisher is for a small, contained fire only — never for a fire that is growing or filling the room with smoke. GNFS says to call for help before attempting to extinguish a serious fire. Both GNFS and NFPA teach the same four actions, remembered as PASS.',
-    '[{"title":"Call 192 first","body":"GNFS says to call for help before attempting to extinguish a serious fire, and to call, or have someone else call, 192 as soon as possible. Ask the fire service to come immediately, giving your address or a landmark and a brief description of the type of fire."},{"title":"Check everyone is out","body":"GNFS says to check that all other people are out of the house and to check that they are all assembled at a safe meeting point. NFPA says to use a portable fire extinguisher only when everyone has exited the building and the fire department has been called or is being called."},{"title":"Only small fires","body":"GNFS says only a contained fire should be fought using a fire extinguisher. NFPA says to use one when the fire is confined to a small area, such as a wastebasket, and is not growing, and the room is not filled with smoke. GNFS says not to attempt to put out a fire where it is emitting toxic smoke."},{"title":"Match it to the fire","body":"The wrong extinguisher makes things worse. GNFS says water is only safe on \"most combustibles other than oils and other insoluble combustible liquids or places involving electricity\" — so never put water on burning cooking oil or on anything electrical. NFPA says that for the home you should select a multi-purpose extinguisher, which can be used on all types of home fires, and GNFS says a multi-purpose extinguisher is best for a home and to check that it is labelled as such. If you do not know what your extinguisher is rated for, do not use it — get out instead."},{"title":"Keep your exit clear","body":"GNFS says to install fire extinguishers close to an exit point, so you can keep your back to the exit and make an easy escape if the fire cannot be controlled. NFPA gives the same advice. GNFS says to keep your mind on the availability of a safe retreat at all times, and if that is threatened at all, to leave at once."},{"title":"Pull the pin","body":"NFPA says to pull the pin: hold the extinguisher with the nozzle pointing away from you, and release the locking mechanism. GNFS says you must break the seal and pull the safety pin from the handle before the extinguisher will discharge."},{"title":"Aim low","body":"NFPA says to aim low and point the extinguisher at the base of the fire, not at the flames. GNFS says to aim the extinguisher nozzle or hose at the base of the fire, and to keep yourself low."},{"title":"Squeeze the lever","body":"NFPA says to squeeze the lever slowly and evenly. GNFS says to squeeze the handle or lever slowly to discharge the agent, and notes that letting go of the handle will stop the discharge, so keep it held down."},{"title":"Sweep side to side","body":"NFPA says to sweep the nozzle from side to side. GNFS says to sweep side to side over the fire, and to stand several metres back, because fire extinguishers are manufactured for use from a distance. Stop when the fire is out — do not keep discharging into a fire that has gone out, and watch in case it re-ignites."},{"title":"Know when to go","body":"NFPA says that if the room fills with smoke, leave immediately. GNFS says a typical fire extinguisher contains around 10 seconds of extinguishing power, and that if the fire does not respond well after you have used it up, move to a place of safety quickly. GNFS says that if the room becomes filled with smoke, make a hasty exit."},{"title":"Afterwards","body":"GNFS says not to leave the area alone once the fire is out, as it might re-ignite without warning, and that the Fire Service can help you make sure the fire is completely extinguished. GNFS says to replace a used extinguisher immediately, because an empty one creates the false impression of being a good extinguisher."},{"title":"Children must not","body":"GNFS says not to allow children to attempt to use a fire extinguisher or control a fire in any respect whatsoever. NFPA says it believes children should not be trained how to operate portable fire extinguishers, because teaching them to do so runs counter to NFPA''s messaging to get out and stay out if there is a fire."}]'::jsonb,
+    'Call 192 first, get everyone out, check the extinguisher suits the fire, then fight it.',
+    'Use an extinguisher only on a small fire that is not spreading. Call for help before you try to put out a serious fire. The four actions are pull, aim, squeeze, sweep.',
+    '[{"title":"Call 192 first","body":"Call 192, or have someone else call, before you try to fight a serious fire. Give your address or a landmark, and say briefly what is burning."},{"title":"Get everyone out","body":"Check that everyone else is out of the building and gathered at a safe meeting point. Only pick up an extinguisher once they are."},{"title":"Only small fires","body":"Use it only if the fire is contained and small — something like a wastebasket — and is not growing. If the room is filling with smoke, leave instead. Never fight a fire that is giving off toxic smoke."},{"title":"Match it first","body":"The wrong extinguisher makes things worse. Never put water on burning oil, and never on anything electrical. Water is only for ordinary burning materials such as paper, cloth, and wood. A multi-purpose extinguisher is the right one for a home — check the label says so. If you do not know what yours is for, do not use it; get out instead."},{"title":"Keep your exit clear","body":"Keep an extinguisher near the door, so you can stand with your back to your way out. Keep thinking about that escape the whole time you are using it. If it is ever cut off, leave at once."},{"title":"Pull the pin","body":"Break the seal and pull the pin out of the handle. Hold the extinguisher with the nozzle pointing away from you."},{"title":"Aim low","body":"Aim at the base of the flames, not at the flames themselves. Keep yourself low."},{"title":"Squeeze the lever","body":"Squeeze the handle slowly and evenly. Letting go stops the spray, so keep it held down."},{"title":"Sweep across","body":"Sweep the nozzle from side to side across the base of the fire. Stand a few metres back — an extinguisher is made to be used from a distance. Stop once the fire is out, and watch in case it starts again."},{"title":"Know when to go","body":"An extinguisher holds only about ten seconds of spray. If the fire is still going once it is empty, get out fast. If the room fills with smoke, get out."},{"title":"After the fire","body":"Do not leave the area — a fire can start again without warning. Let the fire service check that it is properly out. Replace a used extinguisher straight away, because an empty one on the wall is worse than none: people believe it works."},{"title":"Keep children away","body":"Never let a child use an extinguisher or try to control a fire. Children should be taught to get out and stay out, not to fight fires."}]'::jsonb,
     '["extinguisher","fire extinguisher","PASS","pull aim squeeze sweep","put out fire","small fire","extinguisher type"]'::jsonb,
     NULL,
     '[{"title":"How to Use a Fire Extinguisher (archived snapshot, 7 November 2025)","publisher":"Ghana National Fire Service","year":"","url":"https://web.archive.org/web/20251107120210/https://www.gnfs.gov.gh/how-to-use-fire-extinguisher.php"},{"title":"Fire extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/education-and-research/home-fire-safety/fire-extinguishers"},{"title":"NFPA 10, Standard for Portable Fire Extinguishers","publisher":"National Fire Protection Association","year":"","url":"https://www.nfpa.org/codes-and-standards/nfpa-10-standard-development/10","unverified":true}]'::jsonb,
-    '11121671c8f840c6bcfe800017021181d8e0098fbc80f1406fd3a3a833d71d4e',
+    '05c11b88cf05b3ea2d8bd79dcfb3b46974351bb05fcc6e86c2d85b7ce173e3bd',
     'pending_review',
     NULL,           -- reviewer_name
     NULL,     -- reviewer_credential
