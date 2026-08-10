@@ -20,7 +20,9 @@ type hashFixture struct {
 	Expected string `json:"expected"`
 }
 
-func TestContentHashMatchesSharedFixtures(t *testing.T) {
+func loadHashFixtures(t *testing.T) []hashFixture {
+	t.Helper()
+
 	path := filepath.Join("..", "..", "testdata", "content-hash-fixtures.json")
 	raw, err := os.ReadFile(path)
 	if err != nil {
@@ -34,6 +36,12 @@ func TestContentHashMatchesSharedFixtures(t *testing.T) {
 	if len(fixtures) == 0 {
 		t.Fatal("no fixtures loaded")
 	}
+
+	return fixtures
+}
+
+func TestContentHashMatchesSharedFixtures(t *testing.T) {
+	fixtures := loadHashFixtures(t)
 
 	for _, f := range fixtures {
 		t.Run(f.Name, func(t *testing.T) {
@@ -61,5 +69,40 @@ func TestContentHashPreservesNonASCIISpace(t *testing.T) {
 	}
 	if h("a\ufeffb") == withSpace {
 		t.Error("U+FEFF was collapsed as whitespace; it must be preserved as content")
+	}
+}
+
+// TestUnicodeFixturesAreGenuinelyDistinct guards the "unicode-decomposed" and
+// "unicode-composed" fixtures against ever again being written as the same
+// bytes. Those two fixtures only prove NFC normalization works if they
+// differ byte-wise going in and still match hashes coming out. A prior
+// file-writing round-trip once silently normalized the decomposed title into
+// the composed form, which made the equivalence assertion vacuous: the whole
+// suite still passed even with the norm.NFC.String call deleted from
+// contenthash.go.
+func TestUnicodeFixturesAreGenuinelyDistinct(t *testing.T) {
+	fixtures := loadHashFixtures(t)
+
+	var decomposed, composed *hashFixture
+	for i := range fixtures {
+		switch fixtures[i].Name {
+		case "unicode-decomposed":
+			decomposed = &fixtures[i]
+		case "unicode-composed":
+			composed = &fixtures[i]
+		}
+	}
+	if decomposed == nil || composed == nil {
+		t.Fatal("expected both unicode-decomposed and unicode-composed fixtures to be present")
+	}
+
+	if decomposed.Input.Title == composed.Input.Title {
+		t.Fatal("fixtures are byte-identical; the NFC equivalence test proves nothing")
+	}
+
+	got := ContentHash("", decomposed.Input.Title, "", "", nil, nil)
+	want := ContentHash("", composed.Input.Title, "", "", nil, nil)
+	if got != want {
+		t.Error("NFC normalization is not collapsing the two forms")
 	}
 }
