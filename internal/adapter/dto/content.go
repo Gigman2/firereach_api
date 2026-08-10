@@ -1,16 +1,49 @@
 package dto
 
-import "github.com/firereach/api/internal/domain"
+import (
+	"time"
+
+	"github.com/firereach/api/internal/domain"
+)
+
+type StepResponse struct {
+	Title string `json:"title"`
+	Body  string `json:"body"`
+}
+
+type SourceResponse struct {
+	Title      string `json:"title"`
+	Publisher  string `json:"publisher"`
+	Year       string `json:"year"`
+	URL        string `json:"url"`
+	Unverified bool   `json:"unverified,omitempty"`
+}
+
+// ReviewResponse is the provenance behind the badge the app renders. Without
+// it on the wire the badge has no choice but to be a hardcoded literal, which
+// is the defect this feature exists to remove.
+type ReviewResponse struct {
+	State        string     `json:"state"`
+	ReviewerName string     `json:"reviewer_name,omitempty"`
+	Credential   string     `json:"reviewer_credential,omitempty"`
+	ReviewedAt   *time.Time `json:"reviewed_at,omitempty"`
+	ContentHash  string     `json:"content_hash,omitempty"`
+}
 
 type ContentResponse struct {
-	ID               string   `json:"id"`
-	Category         string   `json:"category"`
-	Subcategory      string   `json:"subcategory"`
-	Title            string   `json:"title"`
-	Body             string   `json:"body"`
-	Steps            []string `json:"steps,omitempty"`
-	Tags             []string `json:"tags,omitempty"`
-	ContextualTrigger string  `json:"contextual_trigger,omitempty"`
+	ID                string           `json:"id"`
+	Slug              string           `json:"slug"`
+	Category          string           `json:"category"`
+	Subcategory       string           `json:"subcategory"`
+	Title             string           `json:"title"`
+	Summary           string           `json:"summary,omitempty"`
+	Body              string           `json:"body"`
+	Steps             []StepResponse   `json:"steps,omitempty"`
+	Tags              []string         `json:"tags,omitempty"`
+	ContextualTrigger string           `json:"contextual_trigger,omitempty"`
+	Sources           []SourceResponse `json:"sources"`
+	ContentHash       string           `json:"content_hash"`
+	Review            ReviewResponse   `json:"review"`
 }
 
 type AskAIRequest struct {
@@ -23,15 +56,39 @@ type AskAIResponse struct {
 }
 
 func ToContentResponse(c domain.SafetyContent) ContentResponse {
+	steps := make([]StepResponse, len(c.Steps))
+	for i, s := range c.Steps {
+		steps[i] = StepResponse{Title: s.Title, Body: s.Body}
+	}
+
+	sources := make([]SourceResponse, len(c.Sources))
+	for i, s := range c.Sources {
+		sources[i] = SourceResponse{
+			Title: s.Title, Publisher: s.Publisher,
+			Year: s.Year, URL: s.URL, Unverified: s.Unverified,
+		}
+	}
+
 	return ContentResponse{
-		ID:               c.ID,
-		Category:         c.Category,
-		Subcategory:      c.Subcategory,
-		Title:            c.Title,
-		Body:             c.Body,
-		Steps:            c.Steps,
-		Tags:             c.Tags,
+		ID:                c.ID,
+		Slug:              c.Slug,
+		Category:          c.Category,
+		Subcategory:       c.Subcategory,
+		Title:             c.Title,
+		Summary:           c.Summary,
+		Body:              c.Body,
+		Steps:             steps,
+		Tags:              c.Tags,
 		ContextualTrigger: c.ContextualTrigger,
+		Sources:           sources,
+		ContentHash:       c.ContentHash,
+		Review: ReviewResponse{
+			State:        string(c.Review.State),
+			ReviewerName: c.Review.Name,
+			Credential:   c.Review.Credential,
+			ReviewedAt:   c.Review.ReviewedAt,
+			ContentHash:  c.Review.ContentHash,
+		},
 	}
 }
 

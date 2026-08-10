@@ -112,7 +112,11 @@ func newTestAppWithEnv(env string) *testApp {
 				return &domain.SafetyContent{
 					ID: "content-1", Category: "hazard", Subcategory: "electrical",
 					Title: "Electrical Fire Safety", Body: "Never use water on electrical fires.",
-					Steps: []string{"Cut power", "Use CO2 extinguisher", "Call emergency services"},
+					Steps: []domain.Step{
+						{Title: "Cut power", Body: "Isolate the circuit at the breaker."},
+						{Title: "Use CO2 extinguisher", Body: "Aim at the base of the flames."},
+						{Title: "Call emergency services", Body: "Dial the national emergency number."},
+					},
 				}, nil
 			}
 			return nil, domain.ErrNotFound
