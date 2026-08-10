@@ -69,6 +69,12 @@ func ToContentResponse(c domain.SafetyContent) ContentResponse {
 		}
 	}
 
+	// Recomputed rather than trusted from storage. If a row's text is tampered
+	// with while its hash columns are left alone, a passthrough would ship
+	// content_hash == review.content_hash and the app would render a trust badge
+	// over text no reviewer ever saw.
+	hash := domain.ContentHash(c.Slug, c.Title, c.Summary, c.Body, c.Steps, c.Sources)
+
 	return ContentResponse{
 		ID:                c.ID,
 		Slug:              c.Slug,
@@ -81,7 +87,7 @@ func ToContentResponse(c domain.SafetyContent) ContentResponse {
 		Tags:              c.Tags,
 		ContextualTrigger: c.ContextualTrigger,
 		Sources:           sources,
-		ContentHash:       c.ContentHash,
+		ContentHash:       hash,
 		Review: ReviewResponse{
 			State:        string(c.Review.State),
 			ReviewerName: c.Review.Name,
