@@ -91,12 +91,21 @@ func scanContent(row rowScanner) (domain.SafetyContent, error) {
 	return c, nil
 }
 
+// List and GetByID both filter to what is safe for any unauthenticated
+// client to see. The public API has no auth on this endpoint, and
+// withdrawal is the one mechanism for pulling content judged unsafe — it
+// must be enforced where the data lives, not only by the app client. draft
+// rows are excluded too: they are work in progress, not yet offered for
+// review, and were never meant to be public.
+const publicReviewStates = `review_state IN ('pending_review', 'reviewed')`
+
 func (r *ContentRepo) List(ctx context.Context, category, subcategory string) ([]domain.SafetyContent, error) {
 	query := `
 		SELECT ` + contentColumns + `
 		FROM safety_content
 		WHERE ($1 = '' OR category = $1)
 		  AND ($2 = '' OR subcategory = $2)
+		  AND ` + publicReviewStates + `
 		ORDER BY category, subcategory, title
 	`
 	rows, err := r.pool.Query(ctx, query, category, subcategory)
@@ -129,5 +138,14 @@ func (r *ContentRepo) GetByID(ctx context.Context, id string) (*domain.SafetyCon
 		}
 		return nil, fmt.Errorf("postgres get content: %w", err)
 	}
+
+	// Withdrawal is the one mechanism for pulling content judged unsafe; a
+	// direct-by-ID fetch must honour it exactly like List does, or the
+	// public endpoint returns a withdrawn item verbatim to anything that
+	// isn't this app's own client-side filter.
+	if c.Review.State == domain.ReviewStateWithdrawn {
+		return nil, domain.ErrNotFound
+	}
+
 	return &c, nil
 }

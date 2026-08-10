@@ -3,6 +3,8 @@ package claude
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
@@ -117,6 +119,48 @@ Safety instructions > evacuation guidance > first aid > explanation.
 
 Life safety always comes first.`, EmergencyPhone)
 
+// medicationBrands is the same brand/generic list systemPrompt above already
+// forbids the model from naming (kept in sync with the brands list in
+// gateway_adversarial_test.go's TestRefusesToNameMedication). The prompt is
+// prose sampled probabilistically; the ledger records the medication case as
+// model-sampling-sensitive, meaning it has been observed failing
+// intermittently even with this exact prompt. This slice backs a
+// deterministic filter applied to what the model actually returned, so a
+// sampling miss on the prompt still cannot reach the user.
+var medicationBrands = []string{
+	"ibuprofen", "paracetamol", "acetaminophen", "aspirin",
+	"panadol", "brufen", "nurofen", "advil", "tylenol", "ibucap", "efpac",
+}
+
+// medicationDosagePattern catches a numeric dosage in milligrams (e.g.
+// "400mg", "400 mg") regardless of which drug it's attached to — a response
+// can leak a dose without ever naming a brand on the medicationBrands list
+// above. Named distinctly from gateway_adversarial_test.go's own
+// dosagePattern (same regex, same package, different build tag) to avoid a
+// redeclaration when both are compiled together with `-tags=adversarial`.
+var medicationDosagePattern = regexp.MustCompile(`(?i)\b[0-9]{1,4}\s*mg\b`)
+
+// medicationRefusal mirrors the refusal systemPrompt already instructs the
+// model to give for a pain-relief question, so a filtered response reads the
+// same as a correctly-following one rather than as a visibly different
+// fallback.
+const medicationRefusal = "I can't advise on medication, including its name. A pharmacist or clinician can help with pain relief. For the burn itself, I can help with fire safety first aid."
+
+// containsMedication reports whether text names a forbidden medication brand
+// or generic name, or states a dosage in milligrams. Belt and braces: the
+// system prompt already forbids both, but this is a deterministic check
+// applied to the model's actual output, not a hope that sampling followed
+// the prompt this time.
+func containsMedication(text string) bool {
+	low := strings.ToLower(text)
+	for _, brand := range medicationBrands {
+		if strings.Contains(low, brand) {
+			return true
+		}
+	}
+	return medicationDosagePattern.MatchString(text)
+}
+
 var _ domain.AIGateway = (*Gateway)(nil)
 
 type Gateway struct {
@@ -152,6 +196,17 @@ func (g *Gateway) Ask(ctx context.Context, question, topic string) (string, erro
 
 	for _, block := range resp.Content {
 		if block.Type == "text" {
+			// Output filter, not just an input/prompt-level ban: the prompt
+			// above forbids naming a medication, but the ledger records
+			// this exact case as model-sampling-sensitive — it has been
+			// observed failing intermittently before passing consistently.
+			// If it ever produces a medication name or a dosage anyway, the
+			// contaminated text must not reach the wire; return the same
+			// refusal the model would have given if it had followed the
+			// prompt.
+			if containsMedication(block.Text) {
+				return medicationRefusal, nil
+			}
 			return block.Text, nil
 		}
 	}
