@@ -49,6 +49,17 @@ func TestAskAI_QuestionTooLong(t *testing.T) {
 	}
 }
 
+func TestAskAI_TopicTooLong(t *testing.T) {
+	gw := &mocks.AIGateway{}
+
+	uc := ai.NewAskAI(gw)
+	longTopic := strings.Repeat("a", 101)
+	_, err := uc.Execute(context.Background(), "What do I do if there's a fire?", longTopic)
+	if !errors.Is(err, domain.ErrInvalidInput) {
+		t.Errorf("expected ErrInvalidInput, got %v", err)
+	}
+}
+
 func TestAskAI_GatewayError(t *testing.T) {
 	gw := &mocks.AIGateway{
 		AskFunc: func(ctx context.Context, question, topic string) (string, error) {

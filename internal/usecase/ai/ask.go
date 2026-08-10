@@ -19,6 +19,9 @@ func (uc *AskAI) Execute(ctx context.Context, question, topic string) (string, e
 	if len(question) == 0 || len(question) > 1000 {
 		return "", fmt.Errorf("ask ai: %w", domain.ErrInvalidInput)
 	}
+	if len(topic) > 100 {
+		return "", fmt.Errorf("ask ai: %w", domain.ErrInvalidInput)
+	}
 	resp, err := uc.gateway.Ask(ctx, question, topic)
 	if err != nil {
 		return "", fmt.Errorf("ask ai: %w", err)
