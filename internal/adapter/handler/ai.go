@@ -52,5 +52,5 @@ func (h *AIHandler) Ask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.AskAIResponse{Answer: answer})
+	c.JSON(http.StatusOK, dto.ToAskAIResponse(answer))
 }

@@ -59,9 +59,9 @@ func (m *ContentRepo) GetByID(ctx context.Context, id string) (*domain.SafetyCon
 
 // AIGateway is a mock implementation of domain.AIGateway.
 type AIGateway struct {
-	AskFunc func(ctx context.Context, question, topic string) (string, error)
+	AskFunc func(ctx context.Context, question, topic string) (domain.AIResponse, error)
 }
 
-func (m *AIGateway) Ask(ctx context.Context, question, topic string) (string, error) {
+func (m *AIGateway) Ask(ctx context.Context, question, topic string) (domain.AIResponse, error) {
 	return m.AskFunc(ctx, question, topic)
 }

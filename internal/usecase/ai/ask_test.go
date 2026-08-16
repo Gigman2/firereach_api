@@ -13,8 +13,8 @@ import (
 
 func TestAskAI_Success(t *testing.T) {
 	gw := &mocks.AIGateway{
-		AskFunc: func(ctx context.Context, question, topic string) (string, error) {
-			return "Keep calm and evacuate immediately.", nil
+		AskFunc: func(ctx context.Context, question, topic string) (domain.AIResponse, error) {
+			return domain.AIResponse{Kind: domain.KindText, Body: "Keep calm and evacuate immediately."}, nil
 		},
 	}
 
@@ -23,8 +23,8 @@ func TestAskAI_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if answer == "" {
-		t.Error("expected non-empty answer")
+	if answer.Body == "" {
+		t.Error("expected non-empty answer body")
 	}
 }
 
@@ -62,8 +62,8 @@ func TestAskAI_TopicTooLong(t *testing.T) {
 
 func TestAskAI_GatewayError(t *testing.T) {
 	gw := &mocks.AIGateway{
-		AskFunc: func(ctx context.Context, question, topic string) (string, error) {
-			return "", errors.New("api error")
+		AskFunc: func(ctx context.Context, question, topic string) (domain.AIResponse, error) {
+			return domain.AIResponse{}, errors.New("api error")
 		},
 	}
 
@@ -76,8 +76,8 @@ func TestAskAI_GatewayError(t *testing.T) {
 
 func TestAskAI_RateLimited(t *testing.T) {
 	gw := &mocks.AIGateway{
-		AskFunc: func(ctx context.Context, question, topic string) (string, error) {
-			return "", domain.ErrRateLimited
+		AskFunc: func(ctx context.Context, question, topic string) (domain.AIResponse, error) {
+			return domain.AIResponse{}, domain.ErrRateLimited
 		},
 	}
 

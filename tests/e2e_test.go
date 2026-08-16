@@ -124,8 +124,13 @@ func newTestAppWithEnv(env string) *testApp {
 	}
 
 	aiGateway := &mocks.AIGateway{
-		AskFunc: func(ctx context.Context, question, topic string) (string, error) {
-			return "In case of a fire, evacuate immediately and call emergency services.", nil
+		AskFunc: func(ctx context.Context, question, topic string) (domain.AIResponse, error) {
+			return domain.AIResponse{
+				Kind: domain.KindEmergency,
+				Title: "ACTIVE EMERGENCY",
+				Body: "In case of a fire, evacuate immediately and call emergency services.",
+				Items: []domain.AIStep{{Body: "Get out of the building"}},
+			}, nil
 		},
 	}
 
@@ -449,7 +454,17 @@ func TestAskAI_OK(t *testing.T) {
 	var resp map[string]interface{}
 	json.Unmarshal(w.Body.Bytes(), &resp)
 	if resp["answer"] == "" {
-		t.Error("expected non-empty answer")
+		t.Error("expected non-empty flattened answer")
+	}
+	if resp["kind"] != "emergency" {
+		t.Errorf("expected kind=emergency, got %v", resp["kind"])
+	}
+	if resp["body"] == "" {
+		t.Error("expected non-empty body")
+	}
+	items, ok := resp["items"].([]interface{})
+	if !ok || len(items) != 1 {
+		t.Errorf("expected one item, got %v", resp["items"])
 	}
 }
 

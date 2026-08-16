@@ -51,8 +51,38 @@ type AskAIRequest struct {
 	Topic    string `json:"topic"`
 }
 
+type AIStepResponse struct {
+	Title string `json:"title,omitempty"`
+	Body  string `json:"body"`
+}
+
+// AskAIResponse is the structured answer the chat renders per kind. Answer is
+// a server-computed plain-text flattening kept for backward compatibility,
+// accessibility, and logging; new clients render the structured fields.
 type AskAIResponse struct {
-	Answer string `json:"answer"`
+	Kind    string           `json:"kind"`
+	Title   string           `json:"title,omitempty"`
+	Body    string           `json:"body"`
+	Items   []AIStepResponse `json:"items,omitempty"`
+	Ordered bool             `json:"ordered,omitempty"`
+	Warning string           `json:"warning,omitempty"`
+	Answer  string           `json:"answer"`
+}
+
+func ToAskAIResponse(r domain.AIResponse) AskAIResponse {
+	items := make([]AIStepResponse, len(r.Items))
+	for i, it := range r.Items {
+		items[i] = AIStepResponse{Title: it.Title, Body: it.Body}
+	}
+	return AskAIResponse{
+		Kind:    string(r.Kind),
+		Title:   r.Title,
+		Body:    r.Body,
+		Items:   items,
+		Ordered: r.Ordered,
+		Warning: r.Warning,
+		Answer:  r.Flatten(),
+	}
 }
 
 func ToContentResponse(c domain.SafetyContent) ContentResponse {
