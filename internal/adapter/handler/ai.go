@@ -38,7 +38,12 @@ func (h *AIHandler) Ask(c *gin.Context) {
 		return
 	}
 
-	answer, err := h.askAI.Execute(c.Request.Context(), req.Question, req.Topic)
+	history := make([]domain.Turn, 0, len(req.History))
+	for _, t := range req.History {
+		history = append(history, domain.Turn{Role: t.Role, Content: t.Content})
+	}
+
+	answer, err := h.askAI.Execute(c.Request.Context(), req.Question, req.Topic, history)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidInput) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

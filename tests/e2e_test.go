@@ -124,7 +124,7 @@ func newTestAppWithEnv(env string) *testApp {
 	}
 
 	aiGateway := &mocks.AIGateway{
-		AskFunc: func(ctx context.Context, question, topic string) (domain.AIResponse, error) {
+		AskFunc: func(ctx context.Context, question, topic string, history []domain.Turn) (domain.AIResponse, error) {
 			return domain.AIResponse{
 				Kind: domain.KindEmergency,
 				Title: "ACTIVE EMERGENCY",

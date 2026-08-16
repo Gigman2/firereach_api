@@ -46,9 +46,18 @@ type ContentResponse struct {
 	Review            ReviewResponse   `json:"review"`
 }
 
+// AskTurn is one prior message in the conversation. Role is "user" or
+// "assistant"; an assistant turn's Content is the flattened text of a prior
+// structured answer.
+type AskTurn struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
 type AskAIRequest struct {
-	Question string `json:"question" binding:"required"`
-	Topic    string `json:"topic"`
+	Question string    `json:"question" binding:"required"`
+	Topic    string    `json:"topic"`
+	History  []AskTurn `json:"history"`
 }
 
 type AIStepResponse struct {

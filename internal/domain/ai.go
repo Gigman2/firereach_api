@@ -85,6 +85,14 @@ func (r AIResponse) Flatten() string {
 	return b.String()
 }
 
+// Turn is one prior message in the conversation, user or assistant. History
+// lets a follow-up question carry context; an assistant turn's Content is the
+// flattened text of a prior structured answer.
+type Turn struct {
+	Role    string // "user" or "assistant"
+	Content string
+}
+
 type AIGateway interface {
-	Ask(ctx context.Context, question, topic string) (AIResponse, error)
+	Ask(ctx context.Context, question, topic string, history []Turn) (AIResponse, error)
 }

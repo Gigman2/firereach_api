@@ -160,3 +160,77 @@ func TestFlatten_RendersOrderedAndUnordered(t *testing.T) {
 		t.Errorf("emergency flatten wrong:\n%s", flat)
 	}
 }
+
+// roles extracts the role sequence of a built message list.
+func roles(msgs []anthropic.MessageParam) []string {
+	out := make([]string, len(msgs))
+	for i, m := range msgs {
+		out[i] = string(m.Role)
+	}
+	return out
+}
+
+func TestBuildMessages_NoHistory(t *testing.T) {
+	msgs := buildMessages(nil, "My house is on fire")
+	if len(msgs) != 1 || string(msgs[0].Role) != "user" {
+		t.Fatalf("expected single user message, got %v", roles(msgs))
+	}
+}
+
+func TestBuildMessages_PreservesAlternation(t *testing.T) {
+	h := []domain.Turn{
+		{Role: "user", Content: "How do I treat a burn?"},
+		{Role: "assistant", Content: "Cool it under water."},
+	}
+	msgs := buildMessages(h, "What if it blisters?")
+	got := roles(msgs)
+	want := []string{"user", "assistant", "user"}
+	if len(got) != 3 || got[0] != want[0] || got[1] != want[1] || got[2] != want[2] {
+		t.Fatalf("roles = %v, want %v", got, want)
+	}
+}
+
+func TestBuildMessages_MergesConsecutiveSameRole(t *testing.T) {
+	h := []domain.Turn{
+		{Role: "user", Content: "first"},
+		{Role: "user", Content: "second"},
+	}
+	msgs := buildMessages(h, "third")
+	// three consecutive user turns merge into one, and the new question merges
+	// with them too.
+	if len(msgs) != 1 || string(msgs[0].Role) != "user" {
+		t.Fatalf("expected one merged user message, got %v", roles(msgs))
+	}
+	b, _ := json.Marshal(msgs[0])
+	for _, want := range []string{"first", "second", "third"} {
+		if !strings.Contains(string(b), want) {
+			t.Errorf("merged message missing %q: %s", want, b)
+		}
+	}
+}
+
+func TestBuildMessages_DropsLeadingAssistant(t *testing.T) {
+	h := []domain.Turn{
+		{Role: "assistant", Content: "Hi! I am the assistant."},
+		{Role: "user", Content: "question"},
+	}
+	msgs := buildMessages(h, "follow up")
+	if string(msgs[0].Role) != "user" {
+		t.Fatalf("first message must be user, got %v", roles(msgs))
+	}
+}
+
+func TestBuildMessages_BoundsHistory(t *testing.T) {
+	var h []domain.Turn
+	for i := 0; i < 40; i++ {
+		h = append(h, domain.Turn{Role: "user", Content: "q"})
+		h = append(h, domain.Turn{Role: "assistant", Content: "a"})
+	}
+	msgs := buildMessages(h, "latest")
+	if len(msgs) > maxHistoryTurns {
+		t.Fatalf("expected at most %d messages, got %d", maxHistoryTurns, len(msgs))
+	}
+	if string(msgs[len(msgs)-1].Role) != "user" {
+		t.Errorf("last message must be the new user question, got %v", roles(msgs))
+	}
+}

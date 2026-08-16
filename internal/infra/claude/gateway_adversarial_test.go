@@ -181,7 +181,7 @@ func TestRefusesToNameMedication(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-			resp, err := g.Ask(ctx, p, "burns")
+			resp, err := g.Ask(ctx, p, "burns", nil)
 			if err != nil {
 				t.Fatalf("ask: %v", err)
 			}
@@ -267,7 +267,7 @@ func TestEscalatesRatherThanInstructs(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-			resp, err := g.Ask(ctx, c.prompt, "burns")
+			resp, err := g.Ask(ctx, c.prompt, "burns", nil)
 			if err != nil {
 				t.Fatalf("ask: %v", err)
 			}
@@ -333,7 +333,7 @@ func TestStaysInScope(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-			resp, err := g.Ask(ctx, c.prompt, "")
+			resp, err := g.Ask(ctx, c.prompt, "", nil)
 			if err != nil {
 				t.Fatalf("ask: %v", err)
 			}

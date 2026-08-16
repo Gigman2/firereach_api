@@ -274,7 +274,7 @@ type respondSafetyInput struct {
 	Warning string `json:"warning"`
 }
 
-func (g *Gateway) Ask(ctx context.Context, question, topic string) (domain.AIResponse, error) {
+func (g *Gateway) Ask(ctx context.Context, question, topic string, history []domain.Turn) (domain.AIResponse, error) {
 	userMsg := question
 	if topic != "" {
 		userMsg = fmt.Sprintf("[Topic: %s] %s", topic, question)
@@ -290,9 +290,7 @@ func (g *Gateway) Ask(ctx context.Context, question, topic string) (domain.AIRes
 		// Forcing the tool is what makes the output structured: the model
 		// cannot answer in free prose, only by filling the schema.
 		ToolChoice: anthropic.ToolChoiceParamOfTool("respond_safety"),
-		Messages: []anthropic.MessageParam{
-			anthropic.NewUserMessage(anthropic.NewTextBlock(userMsg)),
-		},
+		Messages:   buildMessages(history, userMsg),
 	})
 
 	if err != nil {
@@ -300,6 +298,60 @@ func (g *Gateway) Ask(ctx context.Context, question, topic string) (domain.AIRes
 	}
 
 	return parseResponse(resp)
+}
+
+// maxHistoryTurns bounds how much of a long chat is sent to the model, so a
+// lengthy conversation cannot blow the token budget. The most recent turns
+// carry the context a follow-up needs; older ones are dropped first.
+const maxHistoryTurns = 12
+
+// buildMessages assembles the conversation for the API: the prior turns plus
+// the new question as the final user turn. The API requires alternating roles
+// starting with a user message, so consecutive same-role turns are merged and
+// any leading assistant turn (a greeting with no question before it) is
+// dropped. Assistant turns carry the flattened text of a prior structured
+// answer, never a tool_use block, which keeps the history a plain
+// user/assistant alternation the forced tool call does not disturb.
+func buildMessages(history []domain.Turn, userMsg string) []anthropic.MessageParam {
+	var turns []domain.Turn
+	add := func(role, content string) {
+		content = strings.TrimSpace(content)
+		if content == "" {
+			return
+		}
+		if role != "assistant" {
+			role = "user"
+		}
+		if len(turns) > 0 && turns[len(turns)-1].Role == role {
+			turns[len(turns)-1].Content += "\n\n" + content
+			return
+		}
+		turns = append(turns, domain.Turn{Role: role, Content: content})
+	}
+	for _, t := range history {
+		add(t.Role, t.Content)
+	}
+	add("user", userMsg)
+
+	for len(turns) > 0 && turns[0].Role == "assistant" {
+		turns = turns[1:]
+	}
+	if len(turns) > maxHistoryTurns {
+		turns = turns[len(turns)-maxHistoryTurns:]
+		for len(turns) > 0 && turns[0].Role == "assistant" {
+			turns = turns[1:]
+		}
+	}
+
+	msgs := make([]anthropic.MessageParam, 0, len(turns))
+	for _, t := range turns {
+		if t.Role == "assistant" {
+			msgs = append(msgs, anthropic.NewAssistantMessage(anthropic.NewTextBlock(t.Content)))
+		} else {
+			msgs = append(msgs, anthropic.NewUserMessage(anthropic.NewTextBlock(t.Content)))
+		}
+	}
+	return msgs
 }
 
 // parseResponse extracts the structured answer from the forced tool call and
