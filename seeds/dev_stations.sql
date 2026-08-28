@@ -24,8 +24,17 @@
 --   NOT VERIFIED FOR EMERGENCY USE. Confirm every number directly
 --   with GNFS before any production deployment.
 --
--- OSM data is ODbL: attribution and share-alike obligations apply
--- to derived databases. Resolve licensing before shipping.
+-- LICENSE: this file is Open Database License (ODbL) v1.0,
+--   separately from the rest of this repository, which is
+--   AGPL-3.0-or-later. See LICENSE-DATA at the repo root. ODbL
+--   share-alike passes to derived databases and cannot be
+--   narrowed by the surrounding code license, so the split is
+--   required rather than preferred.
+--
+--   Contains information from OpenStreetMap, which is made
+--   available under the Open Database License (ODbL) v1.0.
+--   (c) OpenStreetMap contributors
+--   https://www.openstreetmap.org/copyright
 
 BEGIN;
 
