@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -166,7 +166,7 @@ func (h *AuthHandler) Setup(c *gin.Context) {
 		`SELECT COUNT(*) FROM admin_users`,
 	).Scan(&count)
 	if err != nil {
-		log.Printf("failed to check admin count: %v", err)
+		log.Error().Err(err).Msg("failed to check admin count")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to check admin count"})
 		return
 	}
