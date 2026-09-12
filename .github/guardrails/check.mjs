@@ -68,7 +68,7 @@ export function extractImports(filePath, contents) {
   return out;
 }
 
-export function runRules(rules, { root, files, readFile } = {}) {
+export function runRules(rules, { root, files, readFile, onlyLines } = {}) {
   const read =
     readFile ?? ((rel) => fs.readFileSync(path.join(root, rel), "utf8"));
   const violations = [];
@@ -85,7 +85,17 @@ export function runRules(rules, { root, files, readFile } = {}) {
         if (err.code === "ENOENT") continue; // deleted in this diff
         throw err;
       }
-      violations.push(...applyRule(rule, file, contents));
+      let found = applyRule(rule, file, contents);
+      if (onlyLines) {
+        // Line-granular ratchet: a mode: diff rule should only see the lines
+        // a change actually touches. A file absent from the map was not
+        // touched by this diff at all, so it contributes nothing - that is
+        // what keeps frozen debt frozen when an unrelated line in the same
+        // file changes.
+        const lines = onlyLines.get(file);
+        found = lines ? found.filter((v) => lines.has(v.line)) : [];
+      }
+      violations.push(...found);
     }
   }
   return violations;
@@ -219,6 +229,60 @@ export function collectFiles(repoRoot, { fromDiff } = {}) {
   } catch (err) {
     throw new Error(`git ls-files failed: ${err.message}`);
   }
+}
+
+/**
+ * Returns the line numbers a diff actually adds or modifies, per file - what
+ * makes a mode: diff rule line-granular rather than file-granular. Without
+ * this, any changed file has every one of its lines checked, which
+ * resurfaces frozen debt the moment an unrelated line in the same file is
+ * touched.
+ *
+ * Parses `git diff --unified=0 --diff-filter=ACMR <baseRef>...HEAD` hunk
+ * headers of the form `@@ -a,b +c,d @@`: the added-line range is the "+"
+ * side, lines c through c + d - 1. The count is omitted when it is 1
+ * (`@@ -12 +14 @@` means a single line at 14) - the case most likely to be
+ * got wrong. A hunk whose new-side count is explicitly 0 is a pure deletion
+ * at that position and contributes no lines. Deleted files are excluded by
+ * --diff-filter=ACMR, so they never contribute either.
+ */
+export function changedLines(repoRoot, baseRef) {
+  let diffText;
+  try {
+    diffText = execFileSync(
+      "git",
+      ["diff", "--unified=0", "--diff-filter=ACMR", `${baseRef}...HEAD`],
+      { cwd: repoRoot, encoding: "utf8" }
+    );
+  } catch (err) {
+    throw new Error(`git diff failed with ref "${baseRef}": ${err.message}`);
+  }
+
+  const out = new Map();
+  let currentFile = null;
+  for (const line of diffText.split("\n")) {
+    if (line.startsWith("+++ ")) {
+      const raw = line.slice(4).trim();
+      currentFile = raw === "/dev/null" ? null : stripDiffFilePrefix(raw);
+      continue;
+    }
+    if (!line.startsWith("@@ ") || !currentFile) continue;
+    const m = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/.exec(line);
+    if (!m) continue;
+    const start = Number(m[1]);
+    const count = m[2] === undefined ? 1 : Number(m[2]);
+    if (count === 0) continue; // pure deletion at this position, nothing added
+    let set = out.get(currentFile);
+    if (!set) out.set(currentFile, (set = new Set()));
+    for (let l = start; l < start + count; l++) set.add(l);
+  }
+  return out;
+}
+
+/** Strips the "b/" prefix (and surrounding quotes) git puts on a diff's "+++" line. */
+function stripDiffFilePrefix(p) {
+  const unquoted = p.startsWith('"') && p.endsWith('"') ? p.slice(1, -1) : p;
+  return unquoted.startsWith("b/") ? unquoted.slice(2) : unquoted;
 }
 
 /**
@@ -382,10 +446,18 @@ const fromDiff = i === -1 ? null : argv[i + 1];
 
 const all = collectFiles(ROOT);
 const changed = fromDiff ? collectFiles(ROOT, { fromDiff }) : all;
+// Line-granular ratchet: only when a base ref was supplied do we narrow
+// mode: diff rules to the lines actually touched, so a full-repo run (no
+// --from-diff) is unchanged from before.
+const onlyLines = fromDiff ? changedLines(ROOT, fromDiff) : null;
 
 const violations = [
   ...runRules(RULES.filter((r) => r.mode === "repo"), { root: ROOT, files: all }),
-  ...runRules(RULES.filter((r) => r.mode === "diff"), { root: ROOT, files: changed }),
+  ...runRules(RULES.filter((r) => r.mode === "diff"), {
+    root: ROOT,
+    files: changed,
+    ...(onlyLines ? { onlyLines } : {}),
+  }),
   ...existingTestViolations(RULES, ROOT),
 ];
 
