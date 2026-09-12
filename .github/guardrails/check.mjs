@@ -55,7 +55,11 @@ function escapeLiteral(s) {
 
 
 const GO_IMPORT = /^\s*(?:import\s+)?(?:[A-Za-z_.][\w.]*\s+)?"([^"]+)"\s*$/;
-const TS_IMPORT = /(?:from|require\()\s*["']([^"']+)["']/;
+// `from "x"` covers a static import and a re-export; `require("x")` and
+// `import("x")` cover the two runtime forms. All three are how a module
+// actually reaches another module, so a forbidden-import rule that only knew
+// `from` could be walked around by writing `await import("...")` instead.
+const TS_IMPORT = /(?:from|require\(|import\()\s*["']([^"']+)["']/;
 
 /** Pulls import specifiers out of a source file, with their line numbers. */
 export function extractImports(filePath, contents) {
@@ -95,6 +99,14 @@ export function runRules(rules, { root, files, readFile, onlyLines } = {}) {
         const lines = onlyLines.get(file);
         found = lines ? found.filter((v) => lines.has(v.line)) : [];
       }
+      // Some rules are about the file, not the line: GR-APP-009 fires on a
+      // test file Jest never collects, where every line is equally guilty and
+      // the fix is to move the file. Reporting each line would put a 300-line
+      // offender past the ten annotations GitHub renders per step, burying
+      // every other guardrail result, and would make the per-line escape
+      // hatch unusable. Applied after the ratchet filter, so a mode: diff rule
+      // still reports a line the diff actually touched rather than line 1.
+      if (rule.once_per_file) found = found.slice(0, 1);
       violations.push(...found);
     }
   }
@@ -320,7 +332,10 @@ const RULES = [
     "deny": [
       "internal/adapter/**",
       "internal/usecase/**",
-      "internal/infra/**"
+      "internal/infra/**",
+      "github.com/gin-gonic/**",
+      "github.com/jackc/**",
+      "net/http"
     ],
     "severity": "error",
     "mode": "repo",
@@ -332,7 +347,10 @@ const RULES = [
     "scope": "internal/usecase/**/*.go",
     "deny": [
       "internal/adapter/**",
-      "internal/infra/**"
+      "internal/infra/**",
+      "github.com/gin-gonic/**",
+      "github.com/jackc/**",
+      "net/http"
     ],
     "allow": [
       "internal/usecase/mocks/**"
@@ -399,11 +417,11 @@ const RULES = [
   {
     "id": "GR-API-007",
     "kind": "deny-pattern",
-    "scope": "internal/**/*.go",
+    "scope": "{cmd,internal}/**/*.go",
     "pattern": "(fmt|log)\\.Print",
     "message": "use the zerolog logger, not fmt.Print or the stdlib log package",
     "severity": "error",
-    "mode": "diff",
+    "mode": "repo",
     "title": "One logger"
   },
   {
@@ -424,11 +442,24 @@ const RULES = [
     "id": "GR-API-009",
     "kind": "deny-pattern",
     "scope": "internal/adapter/**/*.go",
-    "pattern": "jackc/pgx|\\b(SELECT|INSERT INTO|DELETE FROM)\\b|UPDATE .* SET",
+    "pattern": "^(?!\\s*//).*(jackc/pgx|\\b(SELECT|INSERT INTO|DELETE FROM)\\b|UPDATE .* SET)",
     "message": "handlers reach the database through a usecase and a repository, never directly",
     "severity": "error",
     "mode": "diff",
     "title": "Handlers do not talk to the database"
+  },
+  {
+    "id": "GR-API-010",
+    "kind": "deny-pattern",
+    "scope": "internal/**/*.go",
+    "pattern": "api\\.anthropic\\.com",
+    "allow_paths": [
+      "internal/infra/claude/**"
+    ],
+    "message": "every Claude call goes through internal/infra/claude, which owns the key and the filters",
+    "severity": "error",
+    "mode": "repo",
+    "title": "The Claude endpoint is not an api-side URL"
   }
 ];
 
@@ -453,12 +484,23 @@ if (i !== -1 && (argv[i + 1] === undefined || argv[i + 1].startsWith("--"))) {
 }
 const fromDiff = i === -1 ? null : argv[i + 1];
 
-const all = collectFiles(ROOT);
-const changed = fromDiff ? collectFiles(ROOT, { fromDiff }) : all;
-// Line-granular ratchet: only when a base ref was supplied do we narrow
-// mode: diff rules to the lines actually touched, so a full-repo run (no
-// --from-diff) is unchanged from before.
-const onlyLines = fromDiff ? changedLines(ROOT, fromDiff) : null;
+// Same handling as tools/check.mjs: a git failure here (an unknown base ref,
+// a shallow clone with no merge base) is a run that could not happen, not a
+// clean tree, so it exits 2 with the message rather than an uncaught stack
+// trace. CI is the only place this file runs, and a stack trace there reads
+// like a broken checker instead of a broken checkout.
+let all, changed, onlyLines;
+try {
+  all = collectFiles(ROOT);
+  changed = fromDiff ? collectFiles(ROOT, { fromDiff }) : all;
+  // Line-granular ratchet: only when a base ref was supplied do we narrow
+  // mode: diff rules to the lines actually touched, so a full-repo run (no
+  // --from-diff) is unchanged from before.
+  onlyLines = fromDiff ? changedLines(ROOT, fromDiff) : null;
+} catch (err) {
+  process.stderr.write(err.message + "\n");
+  process.exit(2);
+}
 
 const violations = [
   ...runRules(RULES.filter((r) => r.mode === "repo"), { root: ROOT, files: all }),
