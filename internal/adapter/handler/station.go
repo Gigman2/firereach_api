@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 	"github.com/firereach/api/internal/adapter/dto"
 	"github.com/firereach/api/internal/domain"
 	"github.com/firereach/api/internal/usecase/station"
+	"github.com/rs/zerolog/log"
 )
 
 type StationHandler struct {
@@ -151,7 +151,7 @@ func (h *StationHandler) Create(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		fmt.Printf("create station error: %v", err)
+		log.Error().Err(err).Msg("create station")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

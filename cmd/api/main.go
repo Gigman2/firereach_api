@@ -1,14 +1,13 @@
 package main
 
 import (
-	"log"
-
 	"github.com/firereach/api/internal/adapter/handler"
 	"github.com/firereach/api/internal/infra/claude"
 	"github.com/firereach/api/internal/infra/config"
 	"github.com/firereach/api/internal/infra/postgres"
 	"github.com/firereach/api/internal/infra/repo"
 	"github.com/firereach/api/internal/infra/router"
+	"github.com/rs/zerolog/log"
 
 	aiuc "github.com/firereach/api/internal/usecase/ai"
 	contentuc "github.com/firereach/api/internal/usecase/content"
@@ -30,13 +29,13 @@ func main() {
 	// 1. Load config
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		log.Fatal().Err(err).Msg("failed to load config")
 	}
 
 	// 2. Infrastructure — DB and external clients
 	pool, err := postgres.NewPool(cfg.DatabaseURL)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatal().Err(err).Msg("failed to connect to database")
 	}
 	defer pool.Close()
 
@@ -75,8 +74,8 @@ func main() {
 		port = "9000"
 	}
 
-	log.Printf("starting server on :%s", port)
+	log.Info().Str("port", port).Msg("starting server")
 	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("server failed: %v", err)
+		log.Fatal().Err(err).Msg("server failed")
 	}
 }
