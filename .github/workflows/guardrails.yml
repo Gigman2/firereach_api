@@ -1,0 +1,31 @@
+# Architectural guardrails for the FireReach API.
+#
+# The checker is committed at .github/guardrails/check.mjs and is GENERATED from
+# engineering/guardrails/api.md. It is self-contained and dependency-free, so
+# this job needs no npm install and no checkout of a second repo.
+
+name: Guardrails
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guardrails:
+    name: Guardrails
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch --no-tags --depth=50 origin "${{ github.base_ref }}"
+
+      - name: Check architectural guardrails
+        run: node .github/guardrails/check.mjs --from-diff "origin/${{ github.base_ref }}"
