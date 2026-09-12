@@ -323,7 +323,8 @@ const RULES = [
       "internal/infra/**"
     ],
     "severity": "error",
-    "mode": "repo"
+    "mode": "repo",
+    "title": "Domain depends on nothing"
   },
   {
     "id": "GR-API-002",
@@ -337,7 +338,8 @@ const RULES = [
       "internal/usecase/mocks/**"
     ],
     "severity": "error",
-    "mode": "repo"
+    "mode": "repo",
+    "title": "Usecases depend on domain, not on delivery or storage"
   },
   {
     "id": "GR-API-003",
@@ -348,7 +350,8 @@ const RULES = [
       "internal/infra/postgres/**"
     ],
     "severity": "error",
-    "mode": "repo"
+    "mode": "repo",
+    "title": "Handlers do not reach into infra"
   },
   {
     "id": "GR-API-004",
@@ -362,7 +365,8 @@ const RULES = [
       "internal/infra/claude/**"
     ],
     "severity": "error",
-    "mode": "repo"
+    "mode": "repo",
+    "title": "Claude lives in one package"
   },
   {
     "id": "GR-API-005",
@@ -375,7 +379,8 @@ const RULES = [
     ],
     "message": "read configuration through internal/infra/config, not os.Getenv",
     "severity": "error",
-    "mode": "repo"
+    "mode": "repo",
+    "title": "Configuration is validated at startup"
   },
   {
     "id": "GR-API-006",
@@ -388,7 +393,8 @@ const RULES = [
       "internal/**/*_test.go"
     ],
     "severity": "error",
-    "mode": "repo"
+    "mode": "repo",
+    "title": "`192` has one home"
   },
   {
     "id": "GR-API-007",
@@ -397,7 +403,8 @@ const RULES = [
     "pattern": "(fmt|log)\\.Print",
     "message": "use the zerolog logger, not fmt.Print or the stdlib log package",
     "severity": "error",
-    "mode": "diff"
+    "mode": "diff",
+    "title": "One logger"
   },
   {
     "id": "GR-API-008",
@@ -410,7 +417,8 @@ const RULES = [
       "internal/infra/router/**"
     ],
     "severity": "error",
-    "mode": "repo"
+    "mode": "repo",
+    "title": "Infra does not depend on adapter"
   },
   {
     "id": "GR-API-009",
@@ -419,7 +427,8 @@ const RULES = [
     "pattern": "jackc/pgx|\\b(SELECT|INSERT INTO|DELETE FROM)\\b|UPDATE .* SET",
     "message": "handlers reach the database through a usecase and a repository, never directly",
     "severity": "error",
-    "mode": "diff"
+    "mode": "diff",
+    "title": "Handlers do not talk to the database"
   }
 ];
 
