@@ -1,31 +1,53 @@
-# Architectural guardrails for the FireReach API.
+# CI for the FireReach API: architectural guardrails, build, and tests.
 #
-# The checker is committed at .github/guardrails/check.mjs and is GENERATED from
-# engineering/guardrails/api.md. It is self-contained and dependency-free, so
-# this job needs no npm install and no checkout of a second repo.
+# The guardrail checker is committed at .github/guardrails/check.mjs and is
+# GENERATED from engineering/guardrails/api.md. It is self-contained and
+# dependency-free, so it needs no npm install, no Node setup beyond the one
+# already on the runner, and no checkout of a second repo.
+#
+# `--from-diff origin/<base>` narrows the mode: diff rules to the lines this
+# branch touched. A full-repo run reports six frozen GR-API-009 hits on
+# internal/adapter/handler/auth.go, which is documented debt; see
+# engineering/README.md.
 
-name: Guardrails
+name: CI
 
 on:
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  guardrails:
-    name: Guardrails
+  checks:
+    name: Checks
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
+      # fetch-depth: 0 is the whole history, which is what `git diff
+      # origin/main...HEAD` needs to find a merge base. Do not add a second
+      # `git fetch --depth=N` after this: it converts the complete clone back
+      # into a shallow one, and a branch whose fork point is older than that
+      # window then fails with "fatal: no merge base", exit 128.
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Fetch base branch
-        run: git fetch --no-tags --depth=50 origin "${{ github.base_ref }}"
-
       - name: Check architectural guardrails
         run: node .github/guardrails/check.mjs --from-diff "origin/${{ github.base_ref }}"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build
+        run: go build ./...
+
+      - name: Test
+        run: go test ./...
