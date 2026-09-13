@@ -324,6 +324,16 @@ export function report(violations) {
   return blocking;
 }
 
+/**
+ * The same findings `report` prints, as data, for tools that render them
+ * elsewhere (the PR comment). `rules` is every rule that ran, citations
+ * included, so a clean report can still say how much was checked.
+ */
+export function jsonReport(violations, rules) {
+  const blocking = violations.filter((v) => v.severity === "error").length;
+  return { rules: rules.length, blocking, advisory: violations.length - blocking, violations };
+}
+
 const RULES = [
   {
     "id": "GR-API-001",
@@ -463,10 +473,10 @@ const RULES = [
   }
 ];
 
-// collectFiles, existingTestViolations and report come from the engine
-// concatenated above. This runner is argv parsing and the exit call, nothing
-// else, so the file-collection strategy cannot drift between the local CLI and
-// the committed per-repo checkers.
+// collectFiles, existingTestViolations, report and jsonReport come from the
+// engine concatenated above. This runner is argv parsing, the optional JSON
+// report and the exit call, nothing else, so the file-collection strategy
+// cannot drift between the local CLI and the committed per-repo checkers.
 //
 // fs, path and execFileSync look unused here: they are used by the inlined
 // engine, whose own import lines strip() removed.
@@ -477,12 +487,22 @@ import { execFileSync } from "node:child_process";
 const ROOT = process.cwd();
 
 const argv = process.argv.slice(2);
-const i = argv.indexOf("--from-diff");
-if (i !== -1 && (argv[i + 1] === undefined || argv[i + 1].startsWith("--"))) {
-  process.stderr.write("usage: check.mjs [--from-diff <base-ref>]\n");
-  process.exit(2);
+
+// A flag's value, or null when it is absent. A flag with no usable value after
+// it (nothing, a blank, or another flag) is a usage error, exit 2, the same as
+// tools/check.mjs.
+function flag(name) {
+  const at = argv.indexOf(name);
+  if (at === -1) return null;
+  const value = argv[at + 1];
+  if (value === undefined || !value.trim() || value.startsWith("--")) {
+    process.stderr.write("usage: check.mjs [--from-diff <base-ref>] [--json <file>]\n");
+    process.exit(2);
+  }
+  return value;
 }
-const fromDiff = i === -1 ? null : argv[i + 1];
+const fromDiff = flag("--from-diff");
+const json = flag("--json");
 
 // Same handling as tools/check.mjs: a git failure here (an unknown base ref,
 // a shallow clone with no merge base) is a run that could not happen, not a
@@ -511,5 +531,9 @@ const violations = [
   }),
   ...existingTestViolations(RULES, ROOT),
 ];
+
+// The same findings as data, for the PR comment. Written before the exit so a
+// blocking run still leaves its report behind.
+if (json) fs.writeFileSync(json, JSON.stringify(jsonReport(violations, RULES), null, 2) + "\n");
 
 process.exit(report(violations) ? 1 : 0);
