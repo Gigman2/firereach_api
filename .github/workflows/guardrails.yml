@@ -8,10 +8,9 @@
 # beside it, .github/guardrails/comment.mjs, is generated from
 # engineering/tools/comment.mjs the same way and runs on that same Node.
 #
-# `--from-diff origin/<base>` narrows the mode: diff rules to the lines this
-# branch touched. A full-repo run reports six frozen GR-API-009 hits on
-# internal/adapter/handler/auth.go, which is documented debt; see
-# engineering/README.md.
+# `--from-diff origin/<base>` narrows any mode: diff rule to the lines this
+# branch touched. No rule is in diff mode today, so a full-repo run reports
+# zero violations too.
 
 name: CI
 

@@ -9,6 +9,7 @@ import (
 	"github.com/firereach/api/internal/infra/router"
 	"github.com/rs/zerolog/log"
 
+	adminuc "github.com/firereach/api/internal/usecase/admin"
 	aiuc "github.com/firereach/api/internal/usecase/ai"
 	contentuc "github.com/firereach/api/internal/usecase/content"
 	stationuc "github.com/firereach/api/internal/usecase/station"
@@ -45,6 +46,7 @@ func main() {
 	stationRepo := repo.NewStationRepo(pool)
 	submissionRepo := repo.NewSubmissionRepo(pool)
 	contentRepo := repo.NewContentRepo(pool)
+	adminRepo := repo.NewAdminRepo(pool)
 
 	// 4. Use cases — injected with repositories
 	listNearest := stationuc.NewListNearestStations(stationRepo)
@@ -64,7 +66,12 @@ func main() {
 	submissionH := handler.NewSubmissionHandler(createSub, listPending, reviewSub)
 	contentH := handler.NewContentHandler(listContent, getContent)
 	aiH := handler.NewAIHandler(askAI)
-	authH := handler.NewAuthHandler(pool, cfg.JWTSecret)
+	authH := handler.NewAuthHandler(
+		adminuc.NewLogin(adminRepo, cfg.JWTSecret),
+		adminuc.NewCreateAdmin(adminRepo),
+		adminuc.NewListAdmins(adminRepo),
+		adminuc.NewSetup(adminRepo),
+	)
 
 	// 6. Router — wire handlers, start server
 	r := router.New(cfg, stationH, submissionH, contentH, aiH, authH)
