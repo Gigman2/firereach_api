@@ -12,4 +12,4 @@ Load FireReach engineering guardrails before any task in this repo:
 Run `cd ../engineering && node tools/check.mjs api --from-diff origin/main`
 before claiming work is done.
 
-Known clean: a full-repo run (no `--from-diff`) reports six frozen GR-API-009 hits on `internal/adapter/handler/auth.go`, explained in `../engineering/README.md`.
+Known clean: a full-repo run (no `--from-diff`) reports zero violations in this repo.

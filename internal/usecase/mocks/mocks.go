@@ -65,3 +65,28 @@ type AIGateway struct {
 func (m *AIGateway) Ask(ctx context.Context, question, topic string, history []domain.Turn) (domain.AIResponse, error) {
 	return m.AskFunc(ctx, question, topic, history)
 }
+
+// AdminRepo is a mock implementation of domain.AdminRepository.
+type AdminRepo struct {
+	GetByEmailFunc  func(ctx context.Context, email string) (*domain.AdminUser, error)
+	CreateFunc      func(ctx context.Context, email, passwordHash string) (*domain.AdminUser, error)
+	ListFunc        func(ctx context.Context) ([]domain.AdminUser, error)
+	CountFunc       func(ctx context.Context) (int, error)
+	CreateFirstFunc func(ctx context.Context, email, passwordHash string) (*domain.AdminUser, error)
+}
+
+func (m *AdminRepo) GetByEmail(ctx context.Context, email string) (*domain.AdminUser, error) {
+	return m.GetByEmailFunc(ctx, email)
+}
+func (m *AdminRepo) Create(ctx context.Context, email, passwordHash string) (*domain.AdminUser, error) {
+	return m.CreateFunc(ctx, email, passwordHash)
+}
+func (m *AdminRepo) List(ctx context.Context) ([]domain.AdminUser, error) {
+	return m.ListFunc(ctx)
+}
+func (m *AdminRepo) Count(ctx context.Context) (int, error) {
+	return m.CountFunc(ctx)
+}
+func (m *AdminRepo) CreateFirst(ctx context.Context, email, passwordHash string) (*domain.AdminUser, error) {
+	return m.CreateFirstFunc(ctx, email, passwordHash)
+}

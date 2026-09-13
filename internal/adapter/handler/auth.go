@@ -1,25 +1,30 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
-	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 
 	"github.com/firereach/api/internal/adapter/dto"
 	"github.com/firereach/api/internal/domain"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/rs/zerolog/log"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/firereach/api/internal/usecase/admin"
 )
 
+// setupCompletedMsg is the 403 answer setup has always given once any admin
+// exists.
+const setupCompletedMsg = "setup already completed — admin exists"
+
 type AuthHandler struct {
-	pool      *pgxpool.Pool
-	jwtSecret string
+	login  *admin.Login
+	create *admin.CreateAdmin
+	list   *admin.ListAdmins
+	setup  *admin.Setup
 }
 
-func NewAuthHandler(pool *pgxpool.Pool, jwtSecret string) *AuthHandler {
-	return &AuthHandler{pool: pool, jwtSecret: jwtSecret}
+func NewAuthHandler(login *admin.Login, create *admin.CreateAdmin, list *admin.ListAdmins, setup *admin.Setup) *AuthHandler {
+	return &AuthHandler{login: login, create: create, list: list, setup: setup}
 }
 
 // Login godoc
@@ -41,33 +46,18 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	var id, passwordHash string
-	err := h.pool.QueryRow(c.Request.Context(),
-		`SELECT id, password_hash FROM admin_users WHERE email = $1`, req.Email,
-	).Scan(&id, &passwordHash)
-	if err != nil {
+	token, err := h.login.Execute(c.Request.Context(), req.Email, req.Password)
+	if errors.Is(err, domain.ErrUnauthorized) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-		return
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": id,
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
-		"iat": time.Now().Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(h.jwtSecret))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		log.Error().Err(err).Msg("login")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.LoginResponse{Token: tokenString})
+	c.JSON(http.StatusOK, dto.LoginResponse{Token: token})
 }
 
 // Register godoc
@@ -90,23 +80,12 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
+	created, err := h.create.Execute(c.Request.Context(), req.Email, req.Password)
+	if createFailed(c, err, "register admin") {
 		return
 	}
 
-	var id string
-	err = h.pool.QueryRow(c.Request.Context(),
-		`INSERT INTO admin_users (email, password_hash) VALUES ($1, $2) RETURNING id`,
-		req.Email, string(hash),
-	).Scan(&id)
-	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, dto.CreatedAdminResponse{ID: id, Email: req.Email})
+	c.JSON(http.StatusCreated, dto.CreatedAdminResponse{ID: created.ID, Email: created.Email})
 }
 
 // List godoc
@@ -119,32 +98,14 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /admin/users [get]
 func (h *AuthHandler) List(c *gin.Context) {
-	var users []domain.AdminUser
-
-	rows, err := h.pool.Query(c.Request.Context(),
-		`SELECT id, email, created_at FROM admin_users`,
-	)
+	admins, err := h.list.Execute(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list users"})
-		return
-	}
-	defer rows.Close()
-	
-	for rows.Next() {
-		var user domain.AdminUser
-		err := rows.Scan(&user.ID, &user.Email, &user.CreatedAt)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list users"})
-			return
-		}
-		users = append(users, user)
-	}
-	if err := rows.Err(); err != nil {
+		log.Error().Err(err).Msg("list admins")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list users"})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.ToAdminUserListResponse(users))
+	c.JSON(http.StatusOK, dto.ToAdminUserListResponse(admins))
 }
 
 // Setup godoc
@@ -161,17 +122,17 @@ func (h *AuthHandler) List(c *gin.Context) {
 // @Failure      500      {object}  dto.ErrorResponse
 // @Router       /auth/setup [post]
 func (h *AuthHandler) Setup(c *gin.Context) {
-	var count int
-	err := h.pool.QueryRow(c.Request.Context(),
-		`SELECT COUNT(*) FROM admin_users`,
-	).Scan(&count)
+	// Answer 403 before reading the body, as setup always has. This early
+	// check is only the fast path: two requests can both pass it, and the
+	// atomic create below is what guarantees a single first admin.
+	done, err := h.setup.Completed(c.Request.Context())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to check admin count")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to check admin count"})
 		return
 	}
-	if count > 0 {
-		c.JSON(http.StatusForbidden, gin.H{"error": "setup already completed — admin exists"})
+	if done {
+		c.JSON(http.StatusForbidden, gin.H{"error": setupCompletedMsg})
 		return
 	}
 
@@ -181,21 +142,31 @@ func (h *AuthHandler) Setup(c *gin.Context) {
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
+	created, err := h.setup.Execute(c.Request.Context(), req.Email, req.Password)
+	if createFailed(c, err, "setup first admin") {
+		return
+	}
+
+	c.JSON(http.StatusCreated, dto.CreatedAdminResponse{ID: created.ID, Email: created.Email})
+}
+
+// createFailed answers a failed admin creation, shared by register and setup,
+// and reports whether it answered. A duplicate email and a lost setup race
+// keep their own answers; anything else is a server fault, logged, and never
+// dressed up as a duplicate.
+func createFailed(c *gin.Context, err error, op string) bool {
+	switch {
+	case err == nil:
+		return false
+	case errors.Is(err, admin.ErrHashPassword):
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
-		return
-	}
-
-	var id string
-	err = h.pool.QueryRow(c.Request.Context(),
-		`INSERT INTO admin_users (email, password_hash) VALUES ($1, $2) RETURNING id`,
-		req.Email, string(hash),
-	).Scan(&id)
-	if err != nil {
+	case errors.Is(err, domain.ErrAlreadyExists):
 		c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
-		return
+	case errors.Is(err, domain.ErrSetupCompleted):
+		c.JSON(http.StatusForbidden, gin.H{"error": setupCompletedMsg})
+	default:
+		log.Error().Err(err).Msg(op)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 	}
-
-	c.JSON(http.StatusCreated, dto.CreatedAdminResponse{ID: id, Email: req.Email})
+	return true
 }

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,12 +15,14 @@ import (
 	"github.com/firereach/api/internal/domain"
 	"github.com/firereach/api/internal/infra/config"
 	"github.com/firereach/api/internal/infra/router"
+	adminuc "github.com/firereach/api/internal/usecase/admin"
 	"github.com/firereach/api/internal/usecase/ai"
 	contentuc "github.com/firereach/api/internal/usecase/content"
 	"github.com/firereach/api/internal/usecase/mocks"
 	stationuc "github.com/firereach/api/internal/usecase/station"
 	submissionuc "github.com/firereach/api/internal/usecase/submission"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // testApp holds the test server and helper state.
@@ -28,6 +32,8 @@ type testApp struct {
 	subRepo     *mocks.SubmissionRepo
 	contentRepo *mocks.ContentRepo
 	aiGateway   *mocks.AIGateway
+	adminRepo   *mocks.AdminRepo
+	adminStore  *adminStore
 }
 
 func newTestApp() *testApp {
@@ -134,6 +140,14 @@ func newTestAppWithEnv(env string) *testApp {
 		},
 	}
 
+	// An in-memory admin table behind the mock repository, seeded with one
+	// admin, so login, register, list and setup run through the real
+	// usecases and handler. Tests swap single functions to simulate a
+	// database failure or a lost setup race, or empty the store to act as a
+	// fresh system.
+	store := newAdminStore()
+	adminRepo := store.repo()
+
 	// Wire use cases
 	listNearest := stationuc.NewListNearestStations(stationRepo)
 	getStation := stationuc.NewGetStation(stationRepo)
@@ -146,14 +160,17 @@ func newTestAppWithEnv(env string) *testApp {
 	listContent := contentuc.NewListContent(contentRepo)
 	getContent := contentuc.NewGetContent(contentRepo)
 	askAI := ai.NewAskAI(aiGateway)
+	loginAdmin := adminuc.NewLogin(adminRepo, "test-jwt-secret")
+	createAdmin := adminuc.NewCreateAdmin(adminRepo)
+	listAdmins := adminuc.NewListAdmins(adminRepo)
+	setupAdmin := adminuc.NewSetup(adminRepo)
 
-	// Wire handlers — AuthHandler needs a real pool, so we skip auth-dependent tests
-	// that need DB and test the rest of the API
+	// Wire handlers
 	stationH := handler.NewStationHandler(listNearest, getStation, createStation, updateStation, deactivateStation)
 	submissionH := handler.NewSubmissionHandler(createSub, listPending, reviewSub)
 	contentH := handler.NewContentHandler(listContent, getContent)
 	aiH := handler.NewAIHandler(askAI)
-	authH := handler.NewAuthHandler(nil, "test-jwt-secret")
+	authH := handler.NewAuthHandler(loginAdmin, createAdmin, listAdmins, setupAdmin)
 
 	cfg := &config.Config{JWTSecret: "test-jwt-secret", Environment: env}
 	r := router.New(cfg, stationH, submissionH, contentH, aiH, authH)
@@ -164,6 +181,8 @@ func newTestAppWithEnv(env string) *testApp {
 		subRepo:     subRepo,
 		contentRepo: contentRepo,
 		aiGateway:   aiGateway,
+		adminRepo:   adminRepo,
+		adminStore:  store,
 	}
 }
 
@@ -773,4 +792,262 @@ func TestUnknownRoute_404(t *testing.T) {
 	if w.Code != http.StatusNotFound {
 		t.Fatalf("expected 404, got %d", w.Code)
 	}
+}
+
+// ─────────────────────────────────────────────
+// Admin Auth
+// ─────────────────────────────────────────────
+
+const (
+	testAdminEmail    = "admin@firereach.test"
+	testAdminPassword = "correct-horse-battery"
+)
+
+// adminStore is the in-memory admin_users table behind the mock repository.
+type adminStore struct {
+	admins []domain.AdminUser
+}
+
+func newAdminStore() *adminStore {
+	hash, err := bcrypt.GenerateFromPassword([]byte(testAdminPassword), bcrypt.MinCost)
+	if err != nil {
+		panic(err)
+	}
+	return &adminStore{admins: []domain.AdminUser{{
+		ID: "admin-1", Email: testAdminEmail, PasswordHash: string(hash),
+		CreatedAt: time.Date(2026, 9, 1, 8, 0, 0, 0, time.UTC),
+	}}}
+}
+
+func (s *adminStore) insert(email, hash string) *domain.AdminUser {
+	a := domain.AdminUser{
+		ID: fmt.Sprintf("admin-%d", len(s.admins)+1), Email: email, PasswordHash: hash,
+		CreatedAt: time.Now().UTC(),
+	}
+	s.admins = append(s.admins, a)
+	return &a
+}
+
+func (s *adminStore) repo() *mocks.AdminRepo {
+	return &mocks.AdminRepo{
+		GetByEmailFunc: func(ctx context.Context, email string) (*domain.AdminUser, error) {
+			for _, a := range s.admins {
+				if a.Email == email {
+					found := a
+					return &found, nil
+				}
+			}
+			return nil, domain.ErrNotFound
+		},
+		CreateFunc: func(ctx context.Context, email, hash string) (*domain.AdminUser, error) {
+			for _, a := range s.admins {
+				if a.Email == email {
+					return nil, domain.ErrAlreadyExists
+				}
+			}
+			return s.insert(email, hash), nil
+		},
+		ListFunc: func(ctx context.Context) ([]domain.AdminUser, error) {
+			return append([]domain.AdminUser(nil), s.admins...), nil
+		},
+		CountFunc: func(ctx context.Context) (int, error) {
+			return len(s.admins), nil
+		},
+		CreateFirstFunc: func(ctx context.Context, email, hash string) (*domain.AdminUser, error) {
+			if len(s.admins) > 0 {
+				return nil, domain.ErrSetupCompleted
+			}
+			return s.insert(email, hash), nil
+		},
+	}
+}
+
+var errDatabaseDown = errors.New("connection refused")
+
+func assertError(t *testing.T, w *httptest.ResponseRecorder, status int, msg string) {
+	t.Helper()
+	if w.Code != status {
+		t.Fatalf("status = %d, want %d (body %s)", w.Code, status, w.Body)
+	}
+	var body map[string]string
+	if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
+		t.Fatalf("body is not a JSON error: %s", w.Body)
+	}
+	if body["error"] != msg {
+		t.Fatalf("error = %q, want %q", body["error"], msg)
+	}
+}
+
+func login(app *testApp, email, password string) *httptest.ResponseRecorder {
+	return app.request("POST", "/v1/auth/login", map[string]string{"email": email, "password": password})
+}
+
+func TestLogin_OK_TokenOpensTheAdminRoutes(t *testing.T) {
+	app := newTestApp()
+	w := login(app, testAdminEmail, testAdminPassword)
+	if w.Code != http.StatusOK {
+		t.Fatalf("login: %d %s", w.Code, w.Body)
+	}
+	var resp struct {
+		Token string `json:"token"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil || resp.Token == "" {
+		t.Fatalf("no token in %s", w.Body)
+	}
+	w = app.request("GET", "/v1/admin/users", nil, map[string]string{"Authorization": "Bearer " + resp.Token})
+	if w.Code != http.StatusOK {
+		t.Fatalf("the admin routes rejected the token login issued: %d %s", w.Code, w.Body)
+	}
+}
+
+func TestLogin_WrongPassword(t *testing.T) {
+	assertError(t, login(newTestApp(), testAdminEmail, "not-the-password"), http.StatusUnauthorized, "invalid credentials")
+}
+
+func TestLogin_UnknownEmail(t *testing.T) {
+	assertError(t, login(newTestApp(), "nobody@firereach.test", testAdminPassword), http.StatusUnauthorized, "invalid credentials")
+}
+
+// The first bug this refactor fixes: any database error used to come back as
+// "invalid credentials", so an outage looked like a wrong password.
+func TestLogin_DatabaseDownIs500NotBadCredentials(t *testing.T) {
+	app := newTestApp()
+	app.adminRepo.GetByEmailFunc = func(ctx context.Context, email string) (*domain.AdminUser, error) {
+		return nil, errDatabaseDown
+	}
+	assertError(t, login(app, testAdminEmail, testAdminPassword), http.StatusInternalServerError, "internal server error")
+}
+
+func TestLogin_MissingPassword(t *testing.T) {
+	w := newTestApp().request("POST", "/v1/auth/login", map[string]string{"email": testAdminEmail})
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want 400", w.Code)
+	}
+}
+
+func TestRegister_OK_ThenTheNewAdminCanLogIn(t *testing.T) {
+	app := newTestApp()
+	auth := map[string]string{"Authorization": app.adminToken()}
+	w := app.request("POST", "/v1/admin/users", map[string]string{"email": "new@firereach.test", "password": "a-long-password"}, auth)
+	if w.Code != http.StatusCreated {
+		t.Fatalf("register: %d %s", w.Code, w.Body)
+	}
+	var created map[string]string
+	json.Unmarshal(w.Body.Bytes(), &created)
+	if created["id"] == "" || created["email"] != "new@firereach.test" {
+		t.Fatalf("unexpected body %s", w.Body)
+	}
+	if w := login(app, "new@firereach.test", "a-long-password"); w.Code != http.StatusOK {
+		t.Fatalf("the new admin cannot log in: %d %s", w.Code, w.Body)
+	}
+}
+
+func TestRegister_DuplicateEmail(t *testing.T) {
+	app := newTestApp()
+	w := app.request("POST", "/v1/admin/users", map[string]string{"email": testAdminEmail, "password": "a-long-password"},
+		map[string]string{"Authorization": app.adminToken()})
+	assertError(t, w, http.StatusConflict, "email already registered")
+}
+
+// The second bug this refactor fixes: any insert failure used to come back as
+// "email already registered", so an outage looked like a duplicate.
+func TestRegister_DatabaseDownIs500NotConflict(t *testing.T) {
+	app := newTestApp()
+	app.adminRepo.CreateFunc = func(ctx context.Context, email, hash string) (*domain.AdminUser, error) {
+		return nil, errDatabaseDown
+	}
+	w := app.request("POST", "/v1/admin/users", map[string]string{"email": "new@firereach.test", "password": "a-long-password"},
+		map[string]string{"Authorization": app.adminToken()})
+	assertError(t, w, http.StatusInternalServerError, "internal server error")
+}
+
+func TestRegister_ShortPasswordRejected(t *testing.T) {
+	app := newTestApp()
+	w := app.request("POST", "/v1/admin/users", map[string]string{"email": "new@firereach.test", "password": "short"},
+		map[string]string{"Authorization": app.adminToken()})
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want 400", w.Code)
+	}
+}
+
+func TestListAdmins_OK_NeverReturnsPasswordHashes(t *testing.T) {
+	app := newTestApp()
+	w := app.request("GET", "/v1/admin/users", nil, map[string]string{"Authorization": app.adminToken()})
+	if w.Code != http.StatusOK {
+		t.Fatalf("list: %d %s", w.Code, w.Body)
+	}
+	var list []map[string]string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatalf("not a JSON array: %s", w.Body)
+	}
+	if len(list) != 1 || list[0]["id"] != "admin-1" || list[0]["email"] != testAdminEmail || list[0]["created_at"] != "2026-09-01T08:00:00Z" {
+		t.Fatalf("unexpected list %s", w.Body)
+	}
+	if bytes.Contains(w.Body.Bytes(), []byte("$2a$")) || bytes.Contains(w.Body.Bytes(), []byte("password")) {
+		t.Fatalf("the list leaks a password or hash: %s", w.Body)
+	}
+}
+
+func TestListAdmins_DatabaseDown(t *testing.T) {
+	app := newTestApp()
+	app.adminRepo.ListFunc = func(ctx context.Context) ([]domain.AdminUser, error) { return nil, errDatabaseDown }
+	w := app.request("GET", "/v1/admin/users", nil, map[string]string{"Authorization": app.adminToken()})
+	assertError(t, w, http.StatusInternalServerError, "failed to list users")
+}
+
+func TestSetup_OK_OnAFreshSystem(t *testing.T) {
+	app := newTestApp()
+	app.adminStore.admins = nil
+	w := app.request("POST", "/v1/auth/setup", map[string]string{"email": "first@firereach.test", "password": "a-long-password"})
+	if w.Code != http.StatusCreated {
+		t.Fatalf("setup: %d %s", w.Code, w.Body)
+	}
+	if w := login(app, "first@firereach.test", "a-long-password"); w.Code != http.StatusOK {
+		t.Fatalf("the first admin cannot log in: %d %s", w.Code, w.Body)
+	}
+}
+
+// Setup answers 403 as soon as any admin exists, before it even reads the
+// body, exactly as it did before the refactor.
+func TestSetup_OnceAnAdminExistsIs403EvenForABadBody(t *testing.T) {
+	w := newTestApp().request("POST", "/v1/auth/setup", map[string]string{})
+	assertError(t, w, http.StatusForbidden, "setup already completed — admin exists")
+}
+
+// The third bug this refactor fixes: setup counted, then inserted, so two
+// requests at once could both succeed. Losing that race now answers 403.
+func TestSetup_LosingTheRaceIs403(t *testing.T) {
+	app := newTestApp()
+	app.adminStore.admins = nil
+	app.adminRepo.CreateFirstFunc = func(ctx context.Context, email, hash string) (*domain.AdminUser, error) {
+		return nil, domain.ErrSetupCompleted
+	}
+	w := app.request("POST", "/v1/auth/setup", map[string]string{"email": "first@firereach.test", "password": "a-long-password"})
+	assertError(t, w, http.StatusForbidden, "setup already completed — admin exists")
+}
+
+func TestSetup_BadBodyOnAFreshSystem(t *testing.T) {
+	app := newTestApp()
+	app.adminStore.admins = nil
+	w := app.request("POST", "/v1/auth/setup", map[string]string{"email": "not-an-email"})
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want 400", w.Code)
+	}
+}
+
+func TestSetup_CountFails(t *testing.T) {
+	app := newTestApp()
+	app.adminRepo.CountFunc = func(ctx context.Context) (int, error) { return 0, errDatabaseDown }
+	w := app.request("POST", "/v1/auth/setup", map[string]string{"email": "first@firereach.test", "password": "a-long-password"})
+	assertError(t, w, http.StatusInternalServerError, "failed to check admin count")
+}
+
+func TestSetup_DatabaseDownOnInsert(t *testing.T) {
+	app := newTestApp()
+	app.adminStore.admins = nil
+	app.adminRepo.CreateFirstFunc = func(ctx context.Context, email, hash string) (*domain.AdminUser, error) {
+		return nil, errDatabaseDown
+	}
+	w := app.request("POST", "/v1/auth/setup", map[string]string{"email": "first@firereach.test", "password": "a-long-password"})
+	assertError(t, w, http.StatusInternalServerError, "internal server error")
 }

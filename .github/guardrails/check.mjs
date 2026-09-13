@@ -455,7 +455,7 @@ const RULES = [
     "pattern": "^(?!\\s*//).*(jackc/pgx|\\b(SELECT|INSERT INTO|DELETE FROM)\\b|UPDATE .* SET)",
     "message": "handlers reach the database through a usecase and a repository, never directly",
     "severity": "error",
-    "mode": "diff",
+    "mode": "repo",
     "title": "Handlers do not talk to the database"
   },
   {
