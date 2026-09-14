@@ -95,7 +95,10 @@ func (h *SubmissionHandler) ListPending(c *gin.Context) {
 // @Failure      500      {object}  dto.ErrorResponse
 // @Router       /admin/submissions/{id} [patch]
 func (h *SubmissionHandler) Review(c *gin.Context) {
-	id := c.Param("id")
+	id, ok := pathID(c)
+	if !ok {
+		return
+	}
 
 	var req dto.ReviewSubmissionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

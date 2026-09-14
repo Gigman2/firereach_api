@@ -18,17 +18,15 @@ import (
 	"github.com/firereach/api/internal/infra/repo"
 )
 
-// emptyAdminPool gives each test its own throwaway database holding only the
-// admin_users table, so the first-admin race can start from an empty table
-// without touching a developer's real admins. The table is built from the
-// real migration, so these tests run against the real schema and its UNIQUE
-// email constraint.
-func emptyAdminPool(t *testing.T) *pgxpool.Pool {
+// throwawayPool gives a test its own database, built from the real migrations
+// named, so a test runs against the real schema and its real constraints
+// without touching a developer's data. The database is dropped afterwards.
+func throwawayPool(t *testing.T, prefix string, migrations ...string) *pgxpool.Pool {
 	t.Helper()
 	ctx := context.Background()
 	server := testPool(t) // skips when DATABASE_URL is unset
 
-	name := fmt.Sprintf("admin_repo_test_%d", time.Now().UnixNano())
+	name := fmt.Sprintf("%s_%d", prefix, time.Now().UnixNano())
 	if _, err := server.Exec(ctx, "CREATE DATABASE "+pgx.Identifier{name}.Sanitize()); err != nil {
 		t.Fatalf("create throwaway database: %v", err)
 	}
@@ -38,7 +36,7 @@ func emptyAdminPool(t *testing.T) *pgxpool.Pool {
 		t.Fatalf("parse DATABASE_URL: %v", err)
 	}
 	cfg.ConnConfig.Database = name
-	// Enough connections that every racer below holds its own.
+	// Enough connections that every racer in the first-admin test holds its own.
 	cfg.MaxConns = 60
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
@@ -55,14 +53,25 @@ func emptyAdminPool(t *testing.T) *pgxpool.Pool {
 		}
 	})
 
-	migration, err := os.ReadFile("../migrations/000004_create_admin_users.up.sql")
-	if err != nil {
-		t.Fatalf("read migration: %v", err)
-	}
-	if _, err := pool.Exec(ctx, string(migration)); err != nil {
-		t.Fatalf("apply migration: %v", err)
+	for _, m := range migrations {
+		sql, err := os.ReadFile("../migrations/" + m)
+		if err != nil {
+			t.Fatalf("read migration %s: %v", m, err)
+		}
+		if _, err := pool.Exec(ctx, string(sql)); err != nil {
+			t.Fatalf("apply migration %s: %v", m, err)
+		}
 	}
 	return pool
+}
+
+// emptyAdminPool holds only the admin_users table, so the first-admin race can
+// start from an empty table without touching a developer's real admins. The
+// table is built from the real migration, so these tests run against the real
+// schema and its UNIQUE email constraint.
+func emptyAdminPool(t *testing.T) *pgxpool.Pool {
+	t.Helper()
+	return throwawayPool(t, "admin_repo_test", "000004_create_admin_users.up.sql")
 }
 
 func TestAdminRepo_CreateThenFindByEmail(t *testing.T) {

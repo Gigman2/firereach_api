@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -35,6 +36,16 @@ type testApp struct {
 	adminRepo   *mocks.AdminRepo
 	adminStore  *adminStore
 }
+
+// Ids for the mock repositories. Handlers refuse anything that is not a UUID
+// before a repository sees it, so fixtures use well-formed ones; unknownID is
+// well-formed and matches nothing.
+const (
+	testStationID    = "5a0c5e1e-0000-4000-8000-000000000001"
+	testContentID    = "5a0c5e1e-0000-4000-8000-000000000002"
+	testSubmissionID = "5a0c5e1e-0000-4000-8000-000000000003"
+	unknownID        = "5a0c5e1e-0000-4000-8000-0000000000ff"
+)
 
 func newTestApp() *testApp {
 	return newTestAppWithEnv("")
@@ -67,9 +78,9 @@ func newTestAppWithEnv(env string) *testApp {
 			}, nil
 		},
 		GetByIDFunc: func(ctx context.Context, id string) (*domain.Station, error) {
-			if id == "station-1" {
+			if id == testStationID {
 				return &domain.Station{
-					ID: "station-1", Name: "Accra Central", Region: "Greater Accra",
+					ID: testStationID, Name: "Accra Central", Region: "Greater Accra",
 					District: "Accra Metropolitan", Lat: 5.55, Lng: -0.20, Active: true,
 					Contacts:  []domain.StationContact{{Phone: "0302123456", ResponseRate: 0.95, Active: true}},
 					CreatedAt: time.Now(), UpdatedAt: time.Now(),
@@ -92,14 +103,14 @@ func newTestAppWithEnv(env string) *testApp {
 		ListPendingFunc: func(ctx context.Context) ([]domain.Submission, error) {
 			return []domain.Submission{
 				{
-					ID: "sub-1", Type: "phone_correction", SuggestedValue: "0302999999",
+					ID: testSubmissionID, Type: "wrong_phone", SuggestedValue: "0302999999",
 					DeviceHash: "abc123", Status: domain.SubmissionStatusPending,
 					SubmittedAt: time.Now(),
 				},
 			}, nil
 		},
 		UpdateStatusFunc: func(ctx context.Context, id string, status domain.SubmissionStatus, adminNote string) error {
-			if id == "sub-999" {
+			if id == unknownID {
 				return domain.ErrNotFound
 			}
 			return nil
@@ -114,9 +125,9 @@ func newTestAppWithEnv(env string) *testApp {
 			}, nil
 		},
 		GetByIDFunc: func(ctx context.Context, id string) (*domain.SafetyContent, error) {
-			if id == "content-1" {
+			if id == testContentID {
 				return &domain.SafetyContent{
-					ID: "content-1", Category: "hazard", Subcategory: "electrical",
+					ID: testContentID, Category: "hazard", Subcategory: "electrical",
 					Title: "Electrical Fire Safety", Body: "Never use water on electrical fires.",
 					Steps: []domain.Step{
 						{Title: "Cut power", Body: "Isolate the circuit at the breaker."},
@@ -132,9 +143,9 @@ func newTestAppWithEnv(env string) *testApp {
 	aiGateway := &mocks.AIGateway{
 		AskFunc: func(ctx context.Context, question, topic string, history []domain.Turn) (domain.AIResponse, error) {
 			return domain.AIResponse{
-				Kind: domain.KindEmergency,
+				Kind:  domain.KindEmergency,
 				Title: "ACTIVE EMERGENCY",
-				Body: "In case of a fire, evacuate immediately and call emergency services.",
+				Body:  "In case of a fire, evacuate immediately and call emergency services.",
 				Items: []domain.AIStep{{Body: "Get out of the building"}},
 			}, nil
 		},
@@ -324,7 +335,7 @@ func TestListNearestStations_AcceptsRangeBoundaries(t *testing.T) {
 
 func TestGetStation_OK(t *testing.T) {
 	app := newTestApp()
-	w := app.request("GET", "/v1/stations/station-1", nil)
+	w := app.request("GET", "/v1/stations/"+testStationID, nil)
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
@@ -343,10 +354,37 @@ func TestGetStation_OK(t *testing.T) {
 
 func TestGetStation_NotFound(t *testing.T) {
 	app := newTestApp()
-	w := app.request("GET", "/v1/stations/nonexistent", nil)
+	w := app.request("GET", "/v1/stations/"+unknownID, nil)
 
 	if w.Code != http.StatusNotFound {
 		t.Fatalf("expected 404, got %d", w.Code)
+	}
+}
+
+// A malformed id is refused before it reaches a repository. Postgres rejects a
+// non-UUID with an error the repositories report as a server fault, so these
+// used to answer 500 instead of saying what was wrong with the request.
+func TestMalformedIDIsBadRequest(t *testing.T) {
+	app := newTestApp()
+	admin := map[string]string{"Authorization": app.adminToken()}
+
+	tests := []struct {
+		method  string
+		path    string
+		body    interface{}
+		headers map[string]string
+	}{
+		{"GET", "/v1/stations/not-a-uuid", nil, nil},
+		{"GET", "/v1/content/not-a-uuid", nil, nil},
+		{"PATCH", "/v1/admin/submissions/not-a-uuid", map[string]interface{}{"status": "approved"}, admin},
+		{"PATCH", "/v1/admin/stations/not-a-uuid", map[string]interface{}{"name": "Renamed"}, admin},
+		{"DELETE", "/v1/admin/stations/not-a-uuid", nil, admin},
+	}
+	for _, tt := range tests {
+		w := app.request(tt.method, tt.path, tt.body, tt.headers)
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("%s %s: expected 400, got %d: %s", tt.method, tt.path, w.Code, w.Body.String())
+		}
 	}
 }
 
@@ -357,7 +395,7 @@ func TestGetStation_NotFound(t *testing.T) {
 func TestCreateSubmission_OK(t *testing.T) {
 	app := newTestApp()
 	body := map[string]interface{}{
-		"type":            "phone_correction",
+		"type":            "wrong_phone",
 		"suggested_value": "0302999999",
 		"device_hash":     "device-abc",
 	}
@@ -386,7 +424,7 @@ func TestCreateSubmission_MissingType(t *testing.T) {
 func TestCreateSubmission_MissingDeviceHash(t *testing.T) {
 	app := newTestApp()
 	body := map[string]interface{}{
-		"type":            "phone_correction",
+		"type":            "wrong_phone",
 		"suggested_value": "0302999999",
 	}
 	headers := map[string]string{"X-Device-Hash": "sub-missing-hash-test"}
@@ -427,7 +465,7 @@ func TestListContent_FilterByCategory(t *testing.T) {
 
 func TestGetContent_OK(t *testing.T) {
 	app := newTestApp()
-	w := app.request("GET", "/v1/content/content-1", nil)
+	w := app.request("GET", "/v1/content/"+testContentID, nil)
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
@@ -446,7 +484,7 @@ func TestGetContent_OK(t *testing.T) {
 
 func TestGetContent_NotFound(t *testing.T) {
 	app := newTestApp()
-	w := app.request("GET", "/v1/content/nonexistent", nil)
+	w := app.request("GET", "/v1/content/"+unknownID, nil)
 
 	if w.Code != http.StatusNotFound {
 		t.Fatalf("expected 404, got %d", w.Code)
@@ -523,10 +561,10 @@ func TestAdminRoutes_Unauthorized(t *testing.T) {
 		path   string
 	}{
 		{"GET", "/v1/admin/submissions"},
-		{"PATCH", "/v1/admin/submissions/sub-1"},
+		{"PATCH", "/v1/admin/submissions/" + testSubmissionID},
 		{"POST", "/v1/admin/stations"},
-		{"PATCH", "/v1/admin/stations/station-1"},
-		{"DELETE", "/v1/admin/stations/station-1"},
+		{"PATCH", "/v1/admin/stations/" + testStationID},
+		{"DELETE", "/v1/admin/stations/" + testStationID},
 		{"POST", "/v1/admin/users"},
 		{"GET", "/v1/admin/users"},
 	}
@@ -575,7 +613,7 @@ func TestAdminReviewSubmission_Approve(t *testing.T) {
 		"status":     "approved",
 		"admin_note": "verified",
 	}
-	w := app.request("PATCH", "/v1/admin/submissions/sub-1", body, headers)
+	w := app.request("PATCH", "/v1/admin/submissions/"+testSubmissionID, body, headers)
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
@@ -589,7 +627,7 @@ func TestAdminReviewSubmission_Reject(t *testing.T) {
 		"status":     "rejected",
 		"admin_note": "duplicate submission",
 	}
-	w := app.request("PATCH", "/v1/admin/submissions/sub-1", body, headers)
+	w := app.request("PATCH", "/v1/admin/submissions/"+testSubmissionID, body, headers)
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
@@ -602,7 +640,7 @@ func TestAdminReviewSubmission_InvalidStatus(t *testing.T) {
 	body := map[string]interface{}{
 		"status": "pending",
 	}
-	w := app.request("PATCH", "/v1/admin/submissions/sub-1", body, headers)
+	w := app.request("PATCH", "/v1/admin/submissions/"+testSubmissionID, body, headers)
 
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400, got %d: %s", w.Code, w.Body.String())
@@ -615,7 +653,7 @@ func TestAdminReviewSubmission_NotFound(t *testing.T) {
 	body := map[string]interface{}{
 		"status": "approved",
 	}
-	w := app.request("PATCH", "/v1/admin/submissions/sub-999", body, headers)
+	w := app.request("PATCH", "/v1/admin/submissions/"+unknownID, body, headers)
 
 	if w.Code != http.StatusNotFound {
 		t.Fatalf("expected 404, got %d: %s", w.Code, w.Body.String())
@@ -711,13 +749,78 @@ func TestAdminCreateStation_Unauthorized(t *testing.T) {
 	}
 }
 
+// A longitude of exactly 0 is Tema, on the prime meridian. Sending 0 for a
+// float64 that gin marks `required` reads as "missing", so this used to be
+// refused with a 400.
+func TestAdminCreateStation_AcceptsZeroLongitude(t *testing.T) {
+	app := newTestApp()
+	headers := map[string]string{"Authorization": app.adminToken()}
+	body := map[string]interface{}{
+		"name":     "Tema Station",
+		"region":   "Greater Accra",
+		"district": "Tema Metropolitan",
+		"lat":      5.67,
+		"lng":      0,
+		"contacts": []map[string]interface{}{
+			{"phone": "0303456789", "response_rate": 0.9, "active": true},
+		},
+	}
+	w := app.request("POST", "/v1/admin/stations", body, headers)
+
+	if w.Code != http.StatusCreated {
+		t.Fatalf("expected 201, got %d: %s", w.Code, w.Body.String())
+	}
+}
+
+func TestAdminCreateStation_RejectsCoordinatesOffTheEarth(t *testing.T) {
+	app := newTestApp()
+	headers := map[string]string{"Authorization": app.adminToken()}
+	body := map[string]interface{}{
+		"name":     "Nowhere Station",
+		"region":   "Western",
+		"district": "Sekondi-Takoradi",
+		"lat":      91,
+		"lng":      -1.77,
+		"contacts": []map[string]interface{}{{"phone": "0312345678"}},
+	}
+	w := app.request("POST", "/v1/admin/stations", body, headers)
+
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d: %s", w.Code, w.Body.String())
+	}
+}
+
+// Moving a station onto the prime meridian. The merge used to skip any zero, so
+// the new longitude was dropped and the answer still said "station updated".
+func TestAdminUpdateStation_AppliesAZeroCoordinate(t *testing.T) {
+	app := newTestApp()
+	headers := map[string]string{"Authorization": app.adminToken()}
+	var saved domain.Station
+	app.stationRepo.UpdateFunc = func(ctx context.Context, s domain.Station) error {
+		saved = s
+		return nil
+	}
+
+	w := app.request("PATCH", "/v1/admin/stations/"+testStationID, map[string]interface{}{"lng": 0}, headers)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+	if saved.Lng != 0 {
+		t.Errorf("lng = %v, want 0", saved.Lng)
+	}
+	if saved.Lat != 5.55 {
+		t.Errorf("lat = %v, want the existing 5.55", saved.Lat)
+	}
+}
+
 func TestAdminUpdateStation_OK(t *testing.T) {
 	app := newTestApp()
 	headers := map[string]string{"Authorization": app.adminToken()}
 	body := map[string]interface{}{
 		"name": "Accra Central (Updated)",
 	}
-	w := app.request("PATCH", "/v1/admin/stations/station-1", body, headers)
+	w := app.request("PATCH", "/v1/admin/stations/"+testStationID, body, headers)
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
@@ -730,7 +833,7 @@ func TestAdminUpdateStation_NotFound(t *testing.T) {
 	body := map[string]interface{}{
 		"name": "Ghost Station",
 	}
-	w := app.request("PATCH", "/v1/admin/stations/nonexistent", body, headers)
+	w := app.request("PATCH", "/v1/admin/stations/"+unknownID, body, headers)
 
 	if w.Code != http.StatusNotFound {
 		t.Fatalf("expected 404, got %d: %s", w.Code, w.Body.String())
@@ -740,7 +843,7 @@ func TestAdminUpdateStation_NotFound(t *testing.T) {
 func TestAdminDeactivateStation_OK(t *testing.T) {
 	app := newTestApp()
 	headers := map[string]string{"Authorization": app.adminToken()}
-	w := app.request("DELETE", "/v1/admin/stations/station-1", nil, headers)
+	w := app.request("DELETE", "/v1/admin/stations/"+testStationID, nil, headers)
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
@@ -750,7 +853,7 @@ func TestAdminDeactivateStation_OK(t *testing.T) {
 func TestAdminDeactivateStation_NotFound(t *testing.T) {
 	app := newTestApp()
 	headers := map[string]string{"Authorization": app.adminToken()}
-	w := app.request("DELETE", "/v1/admin/stations/nonexistent", nil, headers)
+	w := app.request("DELETE", "/v1/admin/stations/"+unknownID, nil, headers)
 
 	if w.Code != http.StatusNotFound {
 		t.Fatalf("expected 404, got %d: %s", w.Code, w.Body.String())
@@ -939,6 +1042,22 @@ func TestRegister_OK_ThenTheNewAdminCanLogIn(t *testing.T) {
 	}
 	if w := login(app, "new@firereach.test", "a-long-password"); w.Code != http.StatusOK {
 		t.Fatalf("the new admin cannot log in: %d %s", w.Code, w.Body)
+	}
+}
+
+// bcrypt reads at most 72 bytes. A longer password is the caller's mistake, so
+// it is answered 400; it used to surface as "failed to hash password" with a 500.
+func TestRegisterAdmin_PasswordOver72BytesIsBadRequest(t *testing.T) {
+	app := newTestApp()
+	headers := map[string]string{"Authorization": app.adminToken()}
+	body := map[string]interface{}{
+		"email":    "new@firereach.test",
+		"password": strings.Repeat("x", 73),
+	}
+	w := app.request("POST", "/v1/admin/users", body, headers)
+
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d: %s", w.Code, w.Body.String())
 	}
 }
 

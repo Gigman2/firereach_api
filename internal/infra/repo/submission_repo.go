@@ -2,9 +2,11 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/firereach/api/internal/domain"
@@ -20,11 +22,21 @@ func NewSubmissionRepo(pool *pgxpool.Pool) *SubmissionRepo {
 	return &SubmissionRepo{pool: pool}
 }
 
+// foreignKeyViolation is Postgres's code for an insert whose station_id has no
+// matching station.
+const foreignKeyViolation = "23503"
+
 func (r *SubmissionRepo) Create(ctx context.Context, s domain.Submission) error {
 	_, err := r.pool.Exec(ctx, `
 		INSERT INTO submissions (station_id, type, suggested_value, note, device_hash, status)
 		VALUES ($1, $2, $3, $4, $5, $6)
 	`, s.StationID, s.Type, s.SuggestedValue, s.Note, s.DeviceHash, s.Status)
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == foreignKeyViolation {
+		// A station_id that matches no station: the caller sent an id for
+		// something that is not here, which is a bad request and not a fault.
+		return fmt.Errorf("postgres create submission: unknown station: %w", domain.ErrInvalidInput)
+	}
 	if err != nil {
 		return fmt.Errorf("postgres create submission: %w", err)
 	}

@@ -9,11 +9,13 @@ type ContactInput struct {
 }
 
 type CreateStationRequest struct {
-	Name     string         `json:"name" binding:"required"`
-	Region   string         `json:"region" binding:"required"`
-	District string         `json:"district" binding:"required"`
-	Lat      float64        `json:"lat" binding:"required"`
-	Lng      float64        `json:"lng" binding:"required"`
+	Name     string `json:"name" binding:"required"`
+	Region   string `json:"region" binding:"required"`
+	District string `json:"district" binding:"required"`
+	// Pointers because 0 is a real coordinate: the prime meridian runs through
+	// Tema, and `required` on a float64 refuses 0 as though it were missing.
+	Lat      *float64       `json:"lat" binding:"required"`
+	Lng      *float64       `json:"lng" binding:"required"`
 	Contacts []ContactInput `json:"contacts" binding:"required,min=1"`
 }
 
@@ -21,8 +23,8 @@ type UpdateStationRequest struct {
 	Name     string         `json:"name"`
 	Region   string         `json:"region"`
 	District string         `json:"district"`
-	Lat      float64        `json:"lat"`
-	Lng      float64        `json:"lng"`
+	Lat      *float64       `json:"lat"`
+	Lng      *float64       `json:"lng"`
 	Contacts []ContactInput `json:"contacts"`
 }
 
@@ -32,7 +34,7 @@ func ContactInputsToDomain(inputs []ContactInput) []domain.StationContact {
 		contacts[i] = domain.StationContact{
 			Phone:        c.Phone,
 			ResponseRate: c.ResponseRate,
-			Active:       bool(c.Active) ,
+			Active:       bool(c.Active),
 		}
 	}
 	return contacts

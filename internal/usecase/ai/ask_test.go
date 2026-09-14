@@ -87,3 +87,37 @@ func TestAskAI_RateLimited(t *testing.T) {
 		t.Errorf("expected ErrRateLimited, got %v", err)
 	}
 }
+
+// The limits count characters, not bytes, so an app that caps its input at
+// 1,000 characters can never send a question this refuses. "ɛ" and "ɔ" are Twi
+// letters of two bytes each.
+func TestAskAI_LimitsCountCharactersNotBytes(t *testing.T) {
+	gw := &mocks.AIGateway{
+		AskFunc: func(ctx context.Context, question, topic string, history []domain.Turn) (domain.AIResponse, error) {
+			return domain.AIResponse{Kind: domain.KindText, Body: "ok"}, nil
+		},
+	}
+	uc := ai.NewAskAI(gw)
+
+	question := strings.Repeat("ɛ", 1000)
+	topic := strings.Repeat("ɔ", 100)
+	history := []domain.Turn{{Role: "assistant", Content: strings.Repeat("ɛ", 2000)}}
+	if _, err := uc.Execute(context.Background(), question, topic, history); err != nil {
+		t.Fatalf("at the limits: unexpected error: %v", err)
+	}
+
+	over := []struct {
+		name            string
+		question, topic string
+		history         []domain.Turn
+	}{
+		{"question", strings.Repeat("ɛ", 1001), "", nil},
+		{"topic", "How do I stop a pan fire?", strings.Repeat("ɔ", 101), nil},
+		{"history turn", "How do I stop a pan fire?", "", []domain.Turn{{Role: "user", Content: strings.Repeat("ɛ", 2001)}}},
+	}
+	for _, tt := range over {
+		if _, err := uc.Execute(context.Background(), tt.question, tt.topic, tt.history); !errors.Is(err, domain.ErrInvalidInput) {
+			t.Errorf("%s one character over: expected ErrInvalidInput, got %v", tt.name, err)
+		}
+	}
+}

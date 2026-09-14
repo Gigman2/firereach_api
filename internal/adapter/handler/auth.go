@@ -158,6 +158,8 @@ func createFailed(c *gin.Context, err error, op string) bool {
 	switch {
 	case err == nil:
 		return false
+	case errors.Is(err, domain.ErrInvalidInput):
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	case errors.Is(err, admin.ErrHashPassword):
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
 	case errors.Is(err, domain.ErrAlreadyExists):

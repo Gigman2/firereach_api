@@ -136,16 +136,16 @@ func TestCreateAdmin_DuplicateEmailIsAlreadyExists(t *testing.T) {
 	}
 }
 
-// bcrypt refuses passwords over 72 bytes. That is a hashing failure, and it
-// must stop before anything is written.
-func TestCreateAdmin_PasswordTooLongIsAHashFailure(t *testing.T) {
+// bcrypt reads at most 72 bytes. A longer password is the caller's mistake, not
+// a server fault, and nothing may be written.
+func TestCreateAdmin_PasswordOver72BytesIsInvalidInput(t *testing.T) {
 	repo := &mocks.AdminRepo{CreateFunc: func(ctx context.Context, email, hash string) (*domain.AdminUser, error) {
 		t.Fatal("nothing may be stored when the password cannot be hashed")
 		return nil, nil
 	}}
 	_, err := admin.NewCreateAdmin(repo).Execute(context.Background(), "b@firereach.test", strings.Repeat("x", 73))
-	if !errors.Is(err, admin.ErrHashPassword) {
-		t.Fatalf("err = %v, want ErrHashPassword", err)
+	if !errors.Is(err, domain.ErrInvalidInput) {
+		t.Fatalf("err = %v, want ErrInvalidInput", err)
 	}
 }
 
@@ -205,13 +205,13 @@ func TestSetup_LosingTheRaceIsSetupCompleted(t *testing.T) {
 	}
 }
 
-func TestSetup_PasswordTooLongIsAHashFailure(t *testing.T) {
+func TestSetup_PasswordOver72BytesIsInvalidInput(t *testing.T) {
 	repo := &mocks.AdminRepo{CreateFirstFunc: func(ctx context.Context, email, hash string) (*domain.AdminUser, error) {
 		t.Fatal("nothing may be stored when the password cannot be hashed")
 		return nil, nil
 	}}
 	_, err := admin.NewSetup(repo).Execute(context.Background(), "first@firereach.test", strings.Repeat("x", 73))
-	if !errors.Is(err, admin.ErrHashPassword) {
-		t.Fatalf("err = %v, want ErrHashPassword", err)
+	if !errors.Is(err, domain.ErrInvalidInput) {
+		t.Fatalf("err = %v, want ErrInvalidInput", err)
 	}
 }

@@ -98,11 +98,15 @@ func (h *StationHandler) ListNearest(c *gin.Context) {
 // @Produce      json
 // @Param        id   path      string  true  "Station UUID"
 // @Success      200  {object}  dto.StationResponse
+// @Failure      400  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /stations/{id} [get]
 func (h *StationHandler) GetByID(c *gin.Context) {
-	id := c.Param("id")
+	id, ok := pathID(c)
+	if !ok {
+		return
+	}
 
 	s, err := h.getByID.Execute(c.Request.Context(), id)
 	if err != nil {
@@ -140,8 +144,8 @@ func (h *StationHandler) Create(c *gin.Context) {
 		Name:     req.Name,
 		Region:   req.Region,
 		District: req.District,
-		Lat:      req.Lat,
-		Lng:      req.Lng,
+		Lat:      *req.Lat,
+		Lng:      *req.Lng,
 		Contacts: dto.ContactInputsToDomain(req.Contacts),
 	}
 
@@ -174,7 +178,10 @@ func (h *StationHandler) Create(c *gin.Context) {
 // @Failure      500      {object}  dto.ErrorResponse
 // @Router       /admin/stations/{id} [patch]
 func (h *StationHandler) Update(c *gin.Context) {
-	id := c.Param("id")
+	id, ok := pathID(c)
+	if !ok {
+		return
+	}
 
 	var req dto.UpdateStationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -182,8 +189,7 @@ func (h *StationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	s := domain.Station{
-		ID:       id,
+	patch := station.StationPatch{
 		Name:     req.Name,
 		Region:   req.Region,
 		District: req.District,
@@ -191,10 +197,10 @@ func (h *StationHandler) Update(c *gin.Context) {
 		Lng:      req.Lng,
 	}
 	if req.Contacts != nil {
-		s.Contacts = dto.ContactInputsToDomain(req.Contacts)
+		patch.Contacts = dto.ContactInputsToDomain(req.Contacts)
 	}
 
-	if err := h.update.Execute(c.Request.Context(), s); err != nil {
+	if err := h.update.Execute(c.Request.Context(), id, patch); err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "station not found"})
 			return
@@ -218,12 +224,16 @@ func (h *StationHandler) Update(c *gin.Context) {
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Station UUID"
 // @Success      200  {object}  dto.MessageResponse
+// @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /admin/stations/{id} [delete]
 func (h *StationHandler) Deactivate(c *gin.Context) {
-	id := c.Param("id")
+	id, ok := pathID(c)
+	if !ok {
+		return
+	}
 
 	if err := h.deactivate.Execute(c.Request.Context(), id); err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
