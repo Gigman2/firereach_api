@@ -1,5 +1,12 @@
 basePath: /v1
 definitions:
+  dto.AIStepResponse:
+    properties:
+      body:
+        type: string
+      title:
+        type: string
+    type: object
   dto.AdminUserResponse:
     properties:
       created_at:
@@ -11,6 +18,10 @@ definitions:
     type: object
   dto.AskAIRequest:
     properties:
+      history:
+        items:
+          $ref: '#/definitions/dto.AskTurn'
+        type: array
       question:
         type: string
       topic:
@@ -21,6 +32,27 @@ definitions:
   dto.AskAIResponse:
     properties:
       answer:
+        type: string
+      body:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dto.AIStepResponse'
+        type: array
+      kind:
+        type: string
+      ordered:
+        type: boolean
+      title:
+        type: string
+      warning:
+        type: string
+    type: object
+  dto.AskTurn:
+    properties:
+      content:
+        type: string
+      role:
         type: string
     type: object
   dto.ContactInput:
@@ -40,15 +72,27 @@ definitions:
         type: string
       category:
         type: string
+      content_hash:
+        type: string
       contextual_trigger:
         type: string
       id:
         type: string
+      review:
+        $ref: '#/definitions/dto.ReviewResponse'
+      slug:
+        type: string
+      sources:
+        items:
+          $ref: '#/definitions/dto.SourceResponse'
+        type: array
       steps:
         items:
-          type: string
+          $ref: '#/definitions/dto.StepResponse'
         type: array
       subcategory:
+        type: string
+      summary:
         type: string
       tags:
         items:
@@ -67,6 +111,9 @@ definitions:
       district:
         type: string
       lat:
+        description: |-
+          Pointers because 0 is a real coordinate: the prime meridian runs through
+          Tema, and `required` on a float64 refuses 0 as though it were missing.
         type: number
       lng:
         type: number
@@ -142,6 +189,19 @@ definitions:
     - email
     - password
     type: object
+  dto.ReviewResponse:
+    properties:
+      content_hash:
+        type: string
+      reviewed_at:
+        type: string
+      reviewer_credential:
+        type: string
+      reviewer_name:
+        type: string
+      state:
+        type: string
+    type: object
   dto.ReviewSubmissionRequest:
     properties:
       admin_note:
@@ -150,6 +210,19 @@ definitions:
         type: string
     required:
     - status
+    type: object
+  dto.SourceResponse:
+    properties:
+      publisher:
+        type: string
+      title:
+        type: string
+      unverified:
+        type: boolean
+      url:
+        type: string
+      year:
+        type: string
     type: object
   dto.StationContactResponse:
     properties:
@@ -181,6 +254,13 @@ definitions:
       primary_phone:
         type: string
       region:
+        type: string
+    type: object
+  dto.StepResponse:
+    properties:
+      body:
+        type: string
+      title:
         type: string
     type: object
   dto.SubmissionResponse:
@@ -281,6 +361,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
@@ -629,6 +713,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ContentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -696,6 +784,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.StationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
