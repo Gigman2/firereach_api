@@ -129,6 +129,28 @@ All admin routes require `Authorization: Bearer <token>`.
 | `PATCH` | `/v1/admin/stations/:id` | Update |
 | `DELETE` | `/v1/admin/stations/:id` | Deactivate (soft delete) |
 
+### Request validation
+
+Every `:id` is a UUID. Anything else answers `400 {"error":"invalid id"}` rather
+than reaching Postgres, which rejects a malformed id with an error the
+repositories would report as a server fault.
+
+| Field | Rule |
+| --- | --- |
+| `type` (submission) | One of `wrong_phone`, `wrong_location`, `missing`, `closed`. These strings are the contract with the app. |
+| `suggested_value` | Required, not blank, at most 1000 characters |
+| `note`, `admin_note` | At most 1000 characters |
+| `device_hash` | 1 to 64 letters, digits, `_` or `-`. A rate-limit bucket key, not a credential. |
+| `station_id` | A UUID, or absent when the station is not on file. An id matching no station answers 400. |
+| `question` (AI) | Required, at most 1000 characters |
+| `topic` (AI) | At most 100 characters |
+| `history` (AI) | At most 50 turns, each at most 2000 characters |
+| `lat`, `lng` | Between -90 and 90, and -180 and 180. 0 is a real value: the prime meridian runs through Tema. |
+| `password` | At most 72 bytes, which is bcrypt's own limit |
+
+Text limits count characters, not bytes, so a report written in Twi gets the
+same room as one written in English.
+
 ### First admin
 
 `/v1/auth/setup` is deliberately unauthenticated and self-closing: it creates
