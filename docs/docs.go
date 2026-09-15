@@ -104,6 +104,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/dto.MessageResponse"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
@@ -638,6 +644,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/dto.ContentResponse"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -736,6 +748,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/dto.StationResponse"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -811,6 +829,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.AIStepResponse": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.AdminUserResponse": {
             "type": "object",
             "properties": {
@@ -831,6 +860,12 @@ const docTemplate = `{
                 "question"
             ],
             "properties": {
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AskTurn"
+                    }
+                },
                 "question": {
                     "type": "string"
                 },
@@ -843,6 +878,38 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "answer": {
+                    "type": "string"
+                },
+                "body": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AIStepResponse"
+                    }
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "ordered": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "warning": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AskTurn": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 }
             }
@@ -873,19 +940,37 @@ const docTemplate = `{
                 "category": {
                     "type": "string"
                 },
+                "content_hash": {
+                    "type": "string"
+                },
                 "contextual_trigger": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
+                "review": {
+                    "$ref": "#/definitions/dto.ReviewResponse"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SourceResponse"
+                    }
+                },
                 "steps": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.StepResponse"
                     }
                 },
                 "subcategory": {
+                    "type": "string"
+                },
+                "summary": {
                     "type": "string"
                 },
                 "tags": {
@@ -921,6 +1006,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "lat": {
+                    "description": "Pointers because 0 is a real coordinate: the prime meridian runs through\nTema, and ` + "`" + `required` + "`" + ` on a float64 refuses 0 as though it were missing.",
                     "type": "number"
                 },
                 "lng": {
@@ -1025,6 +1111,26 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ReviewResponse": {
+            "type": "object",
+            "properties": {
+                "content_hash": {
+                    "type": "string"
+                },
+                "reviewed_at": {
+                    "type": "string"
+                },
+                "reviewer_credential": {
+                    "type": "string"
+                },
+                "reviewer_name": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ReviewSubmissionRequest": {
             "type": "object",
             "required": [
@@ -1035,6 +1141,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SourceResponse": {
+            "type": "object",
+            "properties": {
+                "publisher": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "unverified": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "year": {
                     "type": "string"
                 }
             }
@@ -1084,6 +1210,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "region": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.StepResponse": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }

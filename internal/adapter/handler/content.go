@@ -48,11 +48,15 @@ func (h *ContentHandler) List(c *gin.Context) {
 // @Produce      json
 // @Param        id   path      string  true  "Content ID"
 // @Success      200  {object}  dto.ContentResponse
+// @Failure      400  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /content/{id} [get]
 func (h *ContentHandler) GetByID(c *gin.Context) {
-	id := c.Param("id")
+	id, ok := pathID(c)
+	if !ok {
+		return
+	}
 
 	item, err := h.getByID.Execute(c.Request.Context(), id)
 	if err != nil {
